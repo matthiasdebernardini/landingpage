@@ -132,10 +132,7 @@
   }
 
   .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 80px;
-    align-items: start;
+    max-width: 720px;
   }
 
   .hero-label {
@@ -231,94 +228,6 @@
   .btn-secondary:hover {
     border-color: var(--accent);
     color: var(--accent);
-  }
-
-  /* Hero right panel - status card */
-  .status-card {
-    border: 1px solid var(--border);
-    background: var(--surface);
-    padding: 0;
-    position: relative;
-  }
-
-  .status-card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .status-card-header span {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .status-online {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #4ADE80 !important;
-  }
-
-  .status-online::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: #4ADE80;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .status-card-body {
-    padding: 20px;
-  }
-
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stat-row:last-child { border-bottom: none; }
-
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .stat-value {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .stat-value.accent { color: var(--accent); }
-
-  .status-card-footer {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    text-align: center;
-    text-transform: uppercase;
   }
 
   /* === MARQUEE BANNER === */
@@ -500,37 +409,6 @@
     line-height: 1.7;
     color: var(--text-dim);
     margin-bottom: 32px;
-  }
-
-  .mission-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-
-  .mission-stat {
-    background: var(--bg);
-    padding: 24px 20px;
-    text-align: center;
-  }
-
-  .mission-stat-value {
-    font-family: var(--display);
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
-
-  .mission-stat-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
   }
 
   /* === PROCESS === */
@@ -769,7 +647,6 @@
 
   /* === RESPONSIVE === */
   @media (max-width: 1024px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
     .services-grid { grid-template-columns: 1fr; }
     .process-steps { grid-template-columns: repeat(2, 1fr); }
     .process-step:nth-child(2) { border-right: none; }
@@ -788,7 +665,6 @@
     .process-step { border-right: none; border-bottom: 1px solid var(--border); }
     .process-step:last-child { border-bottom: none; }
     .step-arrow { display: none; }
-    .mission-stats { grid-template-columns: 1fr; }
     .hero-actions { flex-direction: column; align-items: flex-start; }
     .footer-cols { flex-direction: column; gap: 32px; }
     .logo-meta { flex-direction: column; gap: 12px; }
@@ -876,40 +752,6 @@
         <a href="mailto:automate@nashvilleautomation.com" class="btn-primary">Get In Touch >>></a>
         <a href="#services" class="btn-secondary">View Services</a>
       </div>
-    </div>
-
-    <div class="status-card">
-      <div class="status-card-header">
-        <span>System Status</span>
-        <span class="status-online">Operational</span>
-      </div>
-      <div class="status-card-body">
-        <div class="stat-row">
-          <span class="stat-label">Processes Automated</span>
-          <span class="stat-value accent">2,847</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Hours Saved / Month</span>
-          <span class="stat-value accent">14,200+</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Active Workflows</span>
-          <span class="stat-value">892</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Error Reduction</span>
-          <span class="stat-value accent">97.3%</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Avg. ROI Timeline</span>
-          <span class="stat-value">6 weeks</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Uptime</span>
-          <span class="stat-value" style="color:#4ADE80">99.98%</span>
-        </div>
-      </div>
-      <div class="status-card-footer">Last updated: Feb 2026 &nbsp; / &nbsp; NAC Operations</div>
     </div>
   </div>
 </section>
@@ -1065,20 +907,6 @@
     <div class="mission-details">
       <p class="mission-body">Nashville Automation Company exists because most businesses are drowning in repetitive tasks that kill morale and waste talent. We're a team of engineers and operators who build systems that handle the monotony -- so your people can focus on creative, strategic, human work.</p>
       <p class="mission-body">Based in Nashville, we work with businesses across the Southeast and beyond. From healthcare to hospitality, logistics to professional services -- if there's a process that makes you groan, we automate it.</p>
-      <div class="mission-stats">
-        <div class="mission-stat">
-          <div class="mission-stat-value">50+</div>
-          <div class="mission-stat-label">Clients Served</div>
-        </div>
-        <div class="mission-stat">
-          <div class="mission-stat-value">97%</div>
-          <div class="mission-stat-label">Retention Rate</div>
-        </div>
-        <div class="mission-stat">
-          <div class="mission-stat-value">6wk</div>
-          <div class="mission-stat-label">Avg. Time to ROI</div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
