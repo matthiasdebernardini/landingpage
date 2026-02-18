@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nashville Automation Company</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --border: #1E1E1E;
+    --accent: #C8954C;
+    --accent-bright: #E8B86D;
+    --text: #E8E4DD;
+    --text-dim: #6B6560;
+    --mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+    --sans: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+    --display: 'Inter', -apple-system, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* === SCANLINE OVERLAY === */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* === TICKER BAR === */
+  .ticker {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--bg);
+  }
+
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 30s linear infinite;
+  }
+
+  .ticker-inner span {
+    padding: 0 40px;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* === NAV === */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .nav-logo svg { flex-shrink: 0; }
+
+  .nav-wordmark {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* === HERO === */
+  .hero {
+    padding: 80px 48px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(56px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 32px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin-bottom: 40px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 2px solid var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-bright);
+    border-color: var(--accent-bright);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Hero right panel - status card */
+  .status-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0;
+    position: relative;
+  }
+
+  .status-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .status-card-header span {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .status-online {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #4ADE80 !important;
+  }
+
+  .status-online::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #4ADE80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-card-body {
+    padding: 20px;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-value.accent { color: var(--accent); }
+
+  .status-card-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* === MARQUEE BANNER === */
+  .marquee-banner {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .marquee-inner {
+    display: inline-flex;
+    animation: marquee 20s linear infinite;
+  }
+
+  .marquee-item {
+    font-family: var(--display);
+    font-size: clamp(48px, 5vw, 72px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--border);
+    padding: 0 24px;
+    -webkit-text-stroke: 1px #2a2a2a;
+    transition: color 0.3s;
+  }
+
+  .marquee-item.filled {
+    color: var(--text);
+    -webkit-text-stroke: none;
+  }
+
+  .marquee-sep {
+    color: var(--accent);
+    padding: 0 16px;
+    font-family: var(--mono);
+    font-size: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* === SERVICES === */
+  .services {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .section-count {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .service-card {
+    background: var(--bg);
+    padding: 36px 28px;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .service-card:hover {
+    background: var(--surface);
+  }
+
+  .service-number {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .service-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .service-card h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .service-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  /* === ABOUT / MISSION === */
+  .mission {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .mission-statement {
+    font-family: var(--display);
+    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .mission-statement em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .mission-details {
+    padding-top: 8px;
+  }
+
+  .mission-body {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .mission-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .mission-stat {
+    background: var(--bg);
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .mission-stat-value {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .mission-stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* === PROCESS === */
+  .process {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .process-step {
+    padding: 36px 28px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .process-step:last-child { border-right: none; }
+
+  .process-step-num {
+    font-family: var(--display);
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--border);
+    margin-bottom: 20px;
+    line-height: 1;
+  }
+
+  .process-step h4 {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .process-step p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .process-step .step-arrow {
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 12px;
+    z-index: 2;
+    background: var(--bg);
+    padding: 4px 0;
+  }
+
+  /* === CTA === */
+  .cta {
+    padding: 100px 48px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .cta h2 {
+    font-family: var(--display);
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .cta-sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .cta-email {
+    font-family: var(--mono);
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    text-decoration: none;
+    border: 2px solid var(--accent);
+    padding: 20px 40px;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+
+  .cta-email:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* === FOOTER === */
+  footer {
+    padding: 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .footer-tagline {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .footer-cols {
+    display: flex;
+    gap: 64px;
+  }
+
+  .footer-col h5 {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .footer-col a {
+    display: block;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--accent); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-bottom span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* === LOGO SHOWCASE === */
+  .logo-showcase {
+    padding: 100px 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .logo-name-large {
+    font-family: var(--display);
+    font-size: clamp(56px, 9vw, 140px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .logo-name-large .nashville {
+    display: block;
+    color: var(--text);
+  }
+
+  .logo-name-large .automation {
+    display: block;
+    color: var(--accent);
+  }
+
+  .logo-name-large .company {
+    display: block;
+    color: var(--text);
+  }
+
+  .logo-meta {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .logo-meta span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .logo-meta span strong {
+    color: var(--text);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: repeat(2, 1fr); }
+    .process-step:nth-child(2) { border-right: none; }
+    .process-step:nth-child(2) .step-arrow { display: none; }
+    .process-step:nth-child(3) { border-top: 1px solid var(--border); }
+    .process-step:nth-child(4) { border-top: 1px solid var(--border); }
+    .mission-grid { grid-template-columns: 1fr; gap: 40px; }
+    nav { padding: 16px 24px; }
+    .hero, .services, .mission, .process, .cta, .logo-showcase, footer { padding-left: 24px; padding-right: 24px; }
+    .footer-top { flex-direction: column; gap: 32px; }
+    .nav-links { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .process-steps { grid-template-columns: 1fr; }
+    .process-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .process-step:last-child { border-bottom: none; }
+    .step-arrow { display: none; }
+    .mission-stats { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; align-items: flex-start; }
+    .footer-cols { flex-direction: column; gap: 32px; }
+    .logo-meta { flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>Automate the dread away</span>
+    <span>/</span>
+    <span>Nashville, Tennessee</span>
+    <span>/</span>
+    <span>Business process automation</span>
+    <span>/</span>
+    <span>Workflow engineering</span>
+    <span>/</span>
+    <span>Systems integration</span>
+    <span>/</span>
+    <span>Automate the dread away</span>
+    <span>/</span>
+    <span>Nashville, Tennessee</span>
+    <span>/</span>
+    <span>Business process automation</span>
+    <span>/</span>
+    <span>Workflow engineering</span>
+    <span>/</span>
+    <span>Systems integration</span>
+    <span>/</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#home">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="2" fill="#C8954C"/>
+      <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
+      <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
+      <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
+    </svg>
+    <div class="nav-wordmark">Nashville<br>Automation Co.</div>
+  </a>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#about">About</a>
+  </div>
+</nav>
+
+<!-- LOGO SHOWCASE -->
+<section class="logo-showcase">
+  <svg width="72" height="72" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="36" height="36" rx="2" fill="#C8954C"/>
+    <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
+    <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
+    <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
+  </svg>
+
+  <div class="logo-name-large">
+    <span class="nashville">Nashville</span>
+    <span class="automation">Automation</span>
+    <span class="company">Company</span>
+  </div>
+
+  <div class="logo-meta">
+    <span>Nashville, TN</span>
+    <span>/</span>
+    <span>Business Automation</span>
+    <span>/</span>
+    <span>Est. 2026</span>
+  </div>
+</section>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-label">Nashville's Premier Automation Partner</div>
+      <h1>Automate<br>the <em>dread</em><br>away.</h1>
+      <p class="hero-sub">We build systems that eliminate the monotony from your workday. Custom automation, workflow engineering, and intelligent integrations that let you focus on work that actually matters.</p>
+      <div class="hero-actions">
+        <a href="mailto:automate@nashvilleautomation.com" class="btn-primary">Get In Touch >>></a>
+        <a href="#services" class="btn-secondary">View Services</a>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-card-header">
+        <span>System Status</span>
+        <span class="status-online">Operational</span>
+      </div>
+      <div class="status-card-body">
+        <div class="stat-row">
+          <span class="stat-label">Processes Automated</span>
+          <span class="stat-value accent">2,847</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Hours Saved / Month</span>
+          <span class="stat-value accent">14,200+</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Active Workflows</span>
+          <span class="stat-value">892</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Error Reduction</span>
+          <span class="stat-value accent">97.3%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Avg. ROI Timeline</span>
+          <span class="stat-value">6 weeks</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Uptime</span>
+          <span class="stat-value" style="color:#4ADE80">99.98%</span>
+        </div>
+      </div>
+      <div class="status-card-footer">Last updated: Feb 2026 &nbsp; / &nbsp; NAC Operations</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-banner">
+  <div class="marquee-inner">
+    <span class="marquee-item filled">Workflows</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Integrations</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item filled">AI Agents</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Data Pipelines</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item filled">Process Design</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Custom Software</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item filled">Workflows</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Integrations</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item filled">AI Agents</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Data Pipelines</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item filled">Process Design</span>
+    <span class="marquee-sep">/</span>
+    <span class="marquee-item">Custom Software</span>
+    <span class="marquee-sep">/</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-header">
+    <div>
+      <div class="section-label">What We Build</div>
+      <h2 class="section-title">Services</h2>
+    </div>
+    <span class="section-count">001 &mdash; 006</span>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-number">01</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h3>Workflow Automation</h3>
+      <p>End-to-end automation of repetitive business processes. We map your workflows, identify bottlenecks, and deploy systems that run without you.</p>
+    </div>
+
+    <div class="service-card">
+      <div class="service-number">02</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m-7-7h6m6 0h6m-16.97-5.97l4.24 4.24m5.46 5.46l4.24 4.24m0-13.94l-4.24 4.24m-5.46 5.46l-4.24 4.24"/></svg>
+      </div>
+      <h3>Systems Integration</h3>
+      <p>Connect your tools into a unified ecosystem. CRM, ERP, accounting, inventory -- we wire them together so data flows where it needs to go.</p>
+    </div>
+
+    <div class="service-card">
+      <div class="service-number">03</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
+      <h3>AI-Powered Agents</h3>
+      <p>Custom AI agents that handle intake, triage, scheduling, and communication. They learn your business logic and execute autonomously.</p>
+    </div>
+
+    <div class="service-card">
+      <div class="service-number">04</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <h3>Document Processing</h3>
+      <p>Automated extraction, classification, and routing of invoices, contracts, and forms. Turn paper chaos into structured data.</p>
+    </div>
+
+    <div class="service-card">
+      <div class="service-number">05</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3>Data Pipelines</h3>
+      <p>Real-time data flows between your systems. Automated reporting, dashboards, and alerts that keep you informed without lifting a finger.</p>
+    </div>
+
+    <div class="service-card">
+      <div class="service-number">06</div>
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h3>Custom Software</h3>
+      <p>When off-the-shelf tools don't cut it, we build exactly what you need. Internal tools, portals, and applications tailored to your operations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="section-header">
+    <div>
+      <div class="section-label">How We Work</div>
+      <h2 class="section-title">Process</h2>
+    </div>
+    <span class="section-count">4 Phases</span>
+  </div>
+
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="process-step-num">01</div>
+      <h4>Audit</h4>
+      <p>We map every process in your operation. Where time goes, where errors happen, where humans are doing what machines should.</p>
+      <span class="step-arrow">>>></span>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">02</div>
+      <h4>Architect</h4>
+      <p>Design the automation blueprint. What gets automated, what stays human, and how everything connects into a single system.</p>
+      <span class="step-arrow">>>></span>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">03</div>
+      <h4>Deploy</h4>
+      <p>Build and launch in rapid sprints. You see working automation within weeks, not months. Every deployment is tested and monitored.</p>
+      <span class="step-arrow">>>></span>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">04</div>
+      <h4>Optimize</h4>
+      <p>Continuous improvement. We monitor performance, identify new opportunities, and evolve your systems as your business grows.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission" id="about">
+  <div class="section-header">
+    <div>
+      <div class="section-label">About NAC</div>
+      <h2 class="section-title">Mission</h2>
+    </div>
+    <span class="section-count">Nashville, TN</span>
+  </div>
+
+  <div class="mission-grid">
+    <div class="mission-statement">
+      We believe nobody should spend their day on work a machine could do <em>better.</em>
+    </div>
+    <div class="mission-details">
+      <p class="mission-body">Nashville Automation Company exists because most businesses are drowning in repetitive tasks that kill morale and waste talent. We're a team of engineers and operators who build systems that handle the monotony -- so your people can focus on creative, strategic, human work.</p>
+      <p class="mission-body">Based in Nashville, we work with businesses across the Southeast and beyond. From healthcare to hospitality, logistics to professional services -- if there's a process that makes you groan, we automate it.</p>
+      <div class="mission-stats">
+        <div class="mission-stat">
+          <div class="mission-stat-value">50+</div>
+          <div class="mission-stat-label">Clients Served</div>
+        </div>
+        <div class="mission-stat">
+          <div class="mission-stat-value">97%</div>
+          <div class="mission-stat-label">Retention Rate</div>
+        </div>
+        <div class="mission-stat">
+          <div class="mission-stat-value">6wk</div>
+          <div class="mission-stat-label">Avg. Time to ROI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <div class="cta-label">>>> Ready to automate? <<<</div>
+  <h2>Stop dreading<br>Monday.</h2>
+  <p class="cta-sub">Let's talk about what we can automate for your business. Reach out and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
+  <a href="mailto:automate@nashvilleautomation.com" class="cta-email">automate@nashvilleautomation.com</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="2" fill="#C8954C"/>
+          <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
+          <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
+          <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
+        </svg>
+        <div class="nav-wordmark">Nashville<br>Automation Co.</div>
+      </div>
+      <div class="footer-tagline">Automate the dread away &mdash; Nashville, TN</div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h5>Navigation</h5>
+        <a href="#services">Services</a>
+        <a href="#process">Process</a>
+        <a href="#about">About</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="mailto:automate@nashvilleautomation.com">automate@nashvilleautomation.com</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Nashville Automation Company. All rights reserved.</span>
+  </div>
+</footer>
+
+</body>
+</html>
