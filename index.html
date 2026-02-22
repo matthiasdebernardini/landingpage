@@ -235,21 +235,22 @@
   /* === STATUS STRIP === */
   .status-strip {
     background: var(--bg-deep);
+    border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    padding: 8px 48px;
+    padding: 16px 48px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
+    font-size: 12px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-dim);
   }
   .status-strip .status-dot {
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     background: var(--accent);
     border-radius: 50%;
     margin-right: 8px;
@@ -262,11 +263,13 @@
 
   /* === LOGO SHOWCASE === */
   .logo-showcase {
-    padding: 160px 48px;
+    min-height: calc(100vh - 100px);
+    padding: 48px;
     border-bottom: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 32px;
     position: relative;
     overflow: hidden;
@@ -1119,12 +1122,6 @@
   </div>
 </div>
 
-<!-- STATUS STRIP -->
-<div class="status-strip">
-  <div><span class="status-dot"></span>Systems operational</div>
-  <div>36.1627&deg; N / 86.7816&deg; W</div>
-</div>
-
 <!-- LOGO SHOWCASE -->
 <section class="logo-showcase">
   <!-- Crosshairs at corners -->
@@ -1147,12 +1144,13 @@
     </div>
   </div>
 
-
-  <div class="logo-showcase-meta-readout" aria-hidden="true">
-    Network type: Process-mesh / Decision layer: AI-native / Status: Active
-  </div>
-
 </section>
+
+<!-- STATUS STRIP -->
+<div class="status-strip">
+  <div><span class="status-dot"></span>Systems: Nominal</div>
+  <div>36.1627&deg; N / 86.7816&deg; W</div>
+</div>
 
 <!-- BARCODE DIVIDER -->
 <div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
@@ -1367,7 +1365,6 @@
   <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
 
-  <div class="cta-label">[ Ready to Automate ]</div>
   <h2>Stop Dreading<br>Monday.</h2>
   <p class="cta-sub">Let's talk about what we can automate for your business. Reach out and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
   <a href="mailto:automate@nashvilleautomation.io" class="cta-email">automate@nashvilleautomation.io</a>
