@@ -1499,7 +1499,7 @@ try {
   // --- Robot arms (3 articulating arms) ---
   const arms = [];
   const armXPositions = [-300, 0, 300];
-  const armPhases = [0, Math.PI * 2 / 3, Math.PI * 4 / 3];
+  const armPhases = [0, 0.333, 0.667];
 
   for (let i = 0; i < 3; i++) {
     const armGroup = new Group();
@@ -1518,7 +1518,7 @@ try {
     const turretCap = new Mesh(new CylinderGeometry(25, 25, 16, 8), dimMat);
     turretGroup.add(turretCap);
 
-    // Shoulder group (Z rotation — tilt)
+    // Shoulder group (X rotation — forward/backward tilt)
     const shoulderGroup = new Group();
     shoulderGroup.position.y = 8;
     turretGroup.add(shoulderGroup);
@@ -1527,7 +1527,7 @@ try {
     upperArm.position.y = 50;
     shoulderGroup.add(upperArm);
 
-    // Elbow group (Z rotation — bend)
+    // Elbow group (X rotation — bend)
     const elbowGroup = new Group();
     elbowGroup.position.y = 100;
     shoulderGroup.add(elbowGroup);
@@ -1549,15 +1549,46 @@ try {
     fingerR.position.set(8, 15, 0);
     gripperGroup.add(fingerR);
 
+    // Box held by gripper (hidden until grabbed)
+    const heldBox = new Mesh(new BoxGeometry(28, 28, 28), orangeMat);
+    heldBox.position.y = 28;
+    heldBox.visible = false;
+    gripperGroup.add(heldBox);
+
     scene.add(armGroup);
     arms.push({
-      turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR,
+      turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR, heldBox,
       phase: armPhases[i],
-      swayAmp: 0.3 + i * 0.05,
-      shoulderAmp: 0.25 + i * 0.03,
-      elbowAmp: 0.35 + i * 0.04,
-      speed: 0.0012 + i * 0.0001,
     });
+  }
+
+  // Pick-and-place keyframes: shoulder X, elbow X, grip (1=open, 0=closed), box visible
+  const KF = [
+    { t: 0.00, sx:  0.2,  ex: 0.5,  g: 1, b: false }, // neutral up, open
+    { t: 0.18, sx:  1.3,  ex: 2.0,  g: 1, b: false }, // reaching down to belt
+    { t: 0.26, sx:  1.3,  ex: 2.0,  g: 0, b: true  }, // grabbed from belt
+    { t: 0.42, sx:  0.2,  ex: 0.5,  g: 0, b: true  }, // lifted up with box
+    { t: 0.58, sx: -0.8,  ex: 2.8,  g: 0, b: true  }, // reaching down behind
+    { t: 0.66, sx: -0.8,  ex: 2.8,  g: 1, b: false }, // released behind
+    { t: 0.82, sx:  0.2,  ex: 0.5,  g: 1, b: false }, // returned up
+    { t: 1.00, sx:  0.2,  ex: 0.5,  g: 1, b: false }, // loop back to neutral
+  ];
+
+  function sampleKF(t) {
+    t = ((t % 1) + 1) % 1;
+    let i0 = KF.length - 2;
+    for (let i = 0; i < KF.length - 1; i++) {
+      if (t >= KF[i].t && t < KF[i + 1].t) { i0 = i; break; }
+    }
+    const k0 = KF[i0], k1 = KF[i0 + 1];
+    const u = (t - k0.t) / (k1.t - k0.t);
+    const s = u * u * (3 - 2 * u); // smoothstep
+    return {
+      sx: k0.sx + (k1.sx - k0.sx) * s,
+      ex: k0.ex + (k1.ex - k0.ex) * s,
+      g:  k0.g  + (k1.g  - k0.g)  * s,
+      b:  k0.b,
+    };
   }
 
   // --- Lighting ---
@@ -1607,24 +1638,24 @@ try {
       if (roller.position.x > 700) roller.position.x -= 1400;
     }
 
-    // Robot arm articulation
-    const t = now * 0.001; // time in seconds
+    // Robot arm pick-and-place (keyframe driven)
     for (const arm of arms) {
-      const cycle = t * arm.speed * 1000 * s + arm.phase;
+      const cycle = now * 0.00018 * s + arm.phase;
+      const p = sampleKF(cycle);
 
-      // Turret swivel (left/right)
-      arm.turretGroup.rotation.y = Math.sin(cycle) * arm.swayAmp;
+      arm.shoulderGroup.rotation.x = p.sx;
+      arm.elbowGroup.rotation.x = p.ex;
 
-      // Shoulder tilt (toward/away from belt)
-      arm.shoulderGroup.rotation.z = -0.4 + Math.sin(cycle * 1.1) * arm.shoulderAmp;
+      // Gripper open/close
+      const spread = p.g * 10;
+      arm.fingerL.position.x = -5 - spread;
+      arm.fingerR.position.x = 5 + spread;
 
-      // Elbow counter-bend
-      arm.elbowGroup.rotation.z = 0.6 + Math.cos(cycle * 1.1) * arm.elbowAmp;
+      // Held box visibility
+      arm.heldBox.visible = p.b;
 
-      // Gripper open/close at 2x speed
-      const grip = Math.sin(cycle * 2) * 0.15;
-      arm.fingerL.position.x = -8 - grip * 30;
-      arm.fingerR.position.x = 8 + grip * 30;
+      // Subtle turret swivel synced to cycle
+      arm.turretGroup.rotation.y = Math.sin(cycle * Math.PI * 2) * 0.12;
     }
 
     effect.render(scene, camera);
