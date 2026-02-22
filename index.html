@@ -4,22 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nashville Automation Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #0A0A0A;
-    --surface: #111111;
-    --border: #1E1E1E;
-    --accent: #C8954C;
-    --accent-bright: #E8B86D;
-    --text: #E8E4DD;
-    --text-dim: #6B6560;
+    --bg: #131110;
+    --bg-deep: #0D0B0A;
+    --surface: #1A1610;
+    --surface-elevated: #211D16;
+    --border: #2A2520;
+    --border-strong: #3D352C;
+    --accent: #E8652B;
+    --accent-bright: #F47A42;
+    --accent-dim: rgba(232,101,43,0.15);
+    --text: #C8B89A;
+    --text-bright: #E8DCC8;
+    --text-dim: #6B6050;
+    --grid-line: rgba(200,184,154,0.06);
+    --crosshair: rgba(200,184,154,0.12);
     --mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
-    --sans: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
-    --display: 'Inter', -apple-system, sans-serif;
+    --sans: 'Space Grotesk', -apple-system, sans-serif;
+    --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --condensed: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   }
 
   html { scroll-behavior: smooth; }
@@ -30,6 +40,22 @@
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    position: relative;
+  }
+
+  /* === GRID TEXTURE BACKGROUND === */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      repeating-linear-gradient(90deg, var(--grid-line) 0px, var(--grid-line) 1px, transparent 1px, transparent 80px),
+      repeating-linear-gradient(0deg, var(--grid-line) 0px, var(--grid-line) 1px, transparent 1px, transparent 80px),
+      repeating-linear-gradient(90deg, rgba(200,184,154,0.025) 0px, rgba(200,184,154,0.025) 1px, transparent 1px, transparent 20px),
+      repeating-linear-gradient(0deg, rgba(200,184,154,0.025) 0px, rgba(200,184,154,0.025) 1px, transparent 1px, transparent 20px);
+    pointer-events: none;
+    z-index: 1;
+    will-change: transform;
   }
 
   /* === SCANLINE OVERLAY === */
@@ -40,27 +66,94 @@
     background: repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
+      transparent 1px,
+      rgba(0,0,0,0.04) 1px,
+      rgba(0,0,0,0.04) 2px
     );
     pointer-events: none;
     z-index: 9999;
   }
 
+  /* === ALL CONTENT ABOVE GRID === */
+  .ticker, nav, section, .marquee-banner, footer, .status-strip {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* === CROSSHAIR MARKERS === */
+  .crosshair {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--crosshair);
+    pointer-events: none;
+    line-height: 1;
+    user-select: none;
+  }
+  .crosshair-accent { color: var(--accent-dim); }
+
+  /* === BRACKET NOTATION FOR SECTION LABELS === */
+  .section-label::before { content: '[ '; }
+  .section-label::after { content: ' ]'; }
+
+  /* === BOXED LABELS === */
+  .box-label {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+  }
+  .box-label-filled {
+    background: var(--accent);
+    color: var(--bg-deep);
+  }
+  .box-label-bordered {
+    border: 1px solid var(--border-strong);
+    color: var(--text-dim);
+  }
+
+  /* === BARCODE DIVIDER === */
+  .barcode-divider {
+    width: 100%;
+    height: 12px;
+    background:
+      repeating-linear-gradient(90deg,
+        var(--border-strong) 0px, var(--border-strong) 2px,
+        transparent 2px, transparent 5px,
+        var(--border-strong) 5px, var(--border-strong) 6px,
+        transparent 6px, transparent 8px,
+        var(--border-strong) 8px, var(--border-strong) 12px,
+        transparent 12px, transparent 14px,
+        var(--border-strong) 14px, var(--border-strong) 15px,
+        transparent 15px, transparent 20px
+      );
+    opacity: 0.5;
+  }
+
+  /* === STAR MARKER === */
+  .star-marker {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
   /* === TICKER BAR === */
   .ticker {
     background: var(--accent);
-    color: var(--bg);
+    color: var(--bg-deep);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 10px 0;
     overflow: hidden;
     white-space: nowrap;
-    border-bottom: 2px solid var(--bg);
+    border-bottom: 2px solid var(--bg-deep);
   }
 
   .ticker-inner {
@@ -83,7 +176,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 48px;
-    border-bottom: 1px solid var(--border);
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--border-strong);
+    z-index: 10;
   }
 
   .nav-logo {
@@ -124,11 +219,148 @@
 
   .nav-links a:hover { color: var(--accent); }
 
+  /* === STATUS STRIP === */
+  .status-strip {
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .status-strip .status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* === LOGO SHOWCASE === */
+  .logo-showcase {
+    padding: 100px 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-showcase::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .logo-showcase > * { position: relative; z-index: 1; }
+
+  .logo-wide-subtitle {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.6em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    width: 100%;
+  }
+
+  .logo-abbrev {
+    position: absolute;
+    top: 32px;
+    right: 48px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    z-index: 1;
+  }
+
+  .logo-name-large {
+    font-family: var(--condensed);
+    font-size: clamp(56px, 9vw, 140px);
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    line-height: 0.88;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .logo-name-large .nashville {
+    display: block;
+    color: var(--text-bright);
+  }
+
+  .logo-name-large .automation {
+    display: block;
+    color: var(--accent);
+  }
+
+  .logo-name-large .company {
+    display: block;
+    color: var(--text-bright);
+  }
+
+  .logo-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .logo-showcase-meta-readout {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .logo-copyright-deco {
+    position: absolute;
+    bottom: 20px;
+    right: 48px;
+    font-family: var(--condensed);
+    font-size: 120px;
+    font-weight: 900;
+    color: var(--border-strong);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.4;
+    z-index: 0;
+  }
+
   /* === HERO === */
   .hero {
     padding: 80px 48px 60px;
     border-bottom: 1px solid var(--border);
     position: relative;
+    overflow: hidden;
   }
 
   .hero-grid {
@@ -157,17 +389,18 @@
   }
 
   .hero h1 {
-    font-family: var(--display);
+    font-family: var(--condensed);
     font-size: clamp(56px, 7vw, 96px);
     font-weight: 900;
     line-height: 0.92;
-    letter-spacing: -0.03em;
-    color: var(--text);
+    letter-spacing: 0.02em;
+    color: var(--text-bright);
     margin-bottom: 32px;
+    text-transform: uppercase;
   }
 
   .hero h1 em {
-    font-style: italic;
+    font-style: normal;
     color: var(--accent);
   }
 
@@ -184,6 +417,58 @@
     display: flex;
     gap: 16px;
     align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .hero-readout {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Compass rose */
+  .compass {
+    position: absolute;
+    top: 32px;
+    right: 48px;
+    width: 60px;
+    height: 60px;
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .compass-n { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+  .compass-s { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+  .compass-e { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+  .compass-w { position: absolute; left: 0; top: 50%; transform: translateY(-50%); }
+  .compass-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .compass-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
   }
 
   .btn-primary {
@@ -191,7 +476,7 @@
     align-items: center;
     gap: 8px;
     background: var(--accent);
-    color: var(--bg);
+    color: var(--bg-deep);
     font-family: var(--mono);
     font-size: 12px;
     font-weight: 700;
@@ -206,6 +491,13 @@
   .btn-primary:hover {
     background: var(--accent-bright);
     border-color: var(--accent-bright);
+  }
+
+  .btn-primary .chevron-anim {
+    transition: letter-spacing 0.2s;
+  }
+  .btn-primary:hover .chevron-anim {
+    letter-spacing: 0.15em;
   }
 
   .btn-secondary {
@@ -236,6 +528,7 @@
     border-bottom: 1px solid var(--border);
     overflow: hidden;
     white-space: nowrap;
+    background: var(--bg-deep);
   }
 
   .marquee-inner {
@@ -244,18 +537,19 @@
   }
 
   .marquee-item {
-    font-family: var(--display);
+    font-family: var(--condensed);
     font-size: clamp(48px, 5vw, 72px);
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.02em;
     color: var(--border);
     padding: 0 24px;
-    -webkit-text-stroke: 1px #2a2a2a;
+    -webkit-text-stroke: 1px var(--border-strong);
+    text-transform: uppercase;
     transition: color 0.3s;
   }
 
   .marquee-item.filled {
-    color: var(--text);
+    color: var(--text-bright);
     -webkit-text-stroke: none;
   }
 
@@ -263,7 +557,7 @@
     color: var(--accent);
     padding: 0 16px;
     font-family: var(--mono);
-    font-size: 32px;
+    font-size: 24px;
     display: inline-flex;
     align-items: center;
   }
@@ -273,12 +567,7 @@
     100% { transform: translateX(-50%); }
   }
 
-  /* === SERVICES === */
-  .services {
-    padding: 80px 48px;
-    border-bottom: 1px solid var(--border);
-  }
-
+  /* === SECTIONS SHARED === */
   .section-header {
     display: flex;
     justify-content: space-between;
@@ -299,11 +588,13 @@
   }
 
   .section-title {
-    font-family: var(--display);
+    font-family: var(--condensed);
     font-size: clamp(32px, 4vw, 48px);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.04em;
     line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--text-bright);
   }
 
   .section-count {
@@ -312,6 +603,13 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-dim);
+  }
+
+  /* === SERVICES === */
+  .services {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
   }
 
   .services-grid {
@@ -333,6 +631,17 @@
     background: var(--surface);
   }
 
+  .service-card .card-crosshair {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--crosshair);
+    pointer-events: none;
+    user-select: none;
+  }
+
   .service-number {
     font-family: var(--mono);
     font-size: 10px;
@@ -345,7 +654,8 @@
   .service-icon {
     width: 40px;
     height: 40px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,11 +671,13 @@
   }
 
   .service-card h3 {
-    font-family: var(--display);
+    font-family: var(--condensed);
     font-size: 22px;
     font-weight: 700;
     margin-bottom: 12px;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-bright);
   }
 
   .service-card p {
@@ -374,47 +686,11 @@
     color: var(--text-dim);
   }
 
-  /* === ABOUT / MISSION === */
-  .mission {
-    padding: 80px 48px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mission-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-
-  .mission-statement {
-    font-family: var(--display);
-    font-size: clamp(28px, 3.5vw, 42px);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-
-  .mission-statement em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .mission-details {
-    padding-top: 8px;
-  }
-
-  .mission-body {
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--text-dim);
-    margin-bottom: 32px;
-  }
-
   /* === PROCESS === */
   .process {
     padding: 80px 48px;
     border-bottom: 1px solid var(--border);
+    position: relative;
   }
 
   .process-steps {
@@ -433,19 +709,23 @@
   .process-step:last-child { border-right: none; }
 
   .process-step-num {
-    font-family: var(--display);
-    font-size: 48px;
+    font-family: var(--condensed);
+    font-size: 64px;
     font-weight: 900;
-    color: var(--border);
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--border-strong);
     margin-bottom: 20px;
     line-height: 1;
   }
 
   .process-step h4 {
-    font-family: var(--sans);
-    font-size: 16px;
+    font-family: var(--condensed);
+    font-size: 18px;
     font-weight: 700;
     margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-bright);
   }
 
   .process-step p {
@@ -454,16 +734,77 @@
     color: var(--text-dim);
   }
 
-  .process-step .step-arrow {
+  .step-arrow {
     position: absolute;
-    right: -7px;
+    right: -16px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--accent);
+    font-family: var(--mono);
     font-size: 12px;
+    font-weight: 700;
     z-index: 2;
     background: var(--bg);
-    padding: 4px 0;
+    padding: 4px 2px;
+    letter-spacing: 0;
+    transition: letter-spacing 0.3s;
+  }
+
+  .process-step:hover .step-arrow {
+    letter-spacing: 0.1em;
+  }
+
+  /* === MISSION === */
+  .mission {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .mission-statement {
+    font-family: var(--condensed);
+    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+  }
+
+  .mission-statement em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .mission-details {
+    padding-top: 8px;
+  }
+
+  .mission-body {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .mission-readout {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
   }
 
   /* === CTA === */
@@ -472,7 +813,23 @@
     text-align: center;
     position: relative;
     border-bottom: 1px solid var(--border);
+    overflow: hidden;
   }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .cta > * { position: relative; z-index: 1; }
 
   .cta-label {
     font-family: var(--mono);
@@ -485,12 +842,14 @@
   }
 
   .cta h2 {
-    font-family: var(--display);
+    font-family: var(--condensed);
     font-size: clamp(40px, 5vw, 72px);
     font-weight: 900;
-    letter-spacing: -0.03em;
+    letter-spacing: 0.02em;
     line-height: 1;
     margin-bottom: 20px;
+    text-transform: uppercase;
+    color: var(--text-bright);
   }
 
   .cta-sub {
@@ -518,13 +877,16 @@
 
   .cta-email:hover {
     background: var(--accent);
-    color: var(--bg);
+    color: var(--bg-deep);
   }
 
   /* === FOOTER === */
   footer {
     padding: 48px;
+    background: var(--bg-deep);
     border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
   }
 
   .footer-top {
@@ -578,10 +940,29 @@
 
   .footer-col a:hover { color: var(--accent); }
 
+  .footer-col a.footer-nav-item {
+    display: block;
+    border: 1px solid var(--border-strong);
+    padding: 10px 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 6px;
+  }
+  .footer-nav-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
   .footer-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 24px;
   }
 
   .footer-bottom span {
@@ -592,57 +973,19 @@
     color: var(--text-dim);
   }
 
-  /* === LOGO SHOWCASE === */
-  .logo-showcase {
-    padding: 100px 48px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 40px;
-  }
-
-  .logo-name-large {
-    font-family: var(--display);
-    font-size: clamp(56px, 9vw, 140px);
+  .footer-copyright-deco {
+    position: absolute;
+    bottom: -10px;
+    right: 48px;
+    font-family: var(--condensed);
+    font-size: 140px;
     font-weight: 900;
-    letter-spacing: -0.04em;
-    line-height: 0.88;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .logo-name-large .nashville {
-    display: block;
-    color: var(--text);
-  }
-
-  .logo-name-large .automation {
-    display: block;
-    color: var(--accent);
-  }
-
-  .logo-name-large .company {
-    display: block;
-    color: var(--text);
-  }
-
-  .logo-meta {
-    display: flex;
-    gap: 48px;
-    align-items: center;
-  }
-
-  .logo-meta span {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .logo-meta span strong {
-    color: var(--text);
+    color: var(--border-strong);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.3;
+    z-index: 0;
   }
 
   /* === RESPONSIVE === */
@@ -658,6 +1001,11 @@
     .hero, .services, .mission, .process, .cta, .logo-showcase, footer { padding-left: 24px; padding-right: 24px; }
     .footer-top { flex-direction: column; gap: 32px; }
     .nav-links { display: none; }
+    .status-strip { padding-left: 24px; padding-right: 24px; }
+    .logo-abbrev { right: 24px; }
+    .logo-copyright-deco { right: 24px; font-size: 80px; }
+    .footer-copyright-deco { right: 24px; font-size: 100px; }
+    .compass { right: 24px; }
   }
 
   @media (max-width: 640px) {
@@ -667,7 +1015,30 @@
     .step-arrow { display: none; }
     .hero-actions { flex-direction: column; align-items: flex-start; }
     .footer-cols { flex-direction: column; gap: 32px; }
-    .logo-meta { flex-direction: column; gap: 12px; }
+    .logo-meta { flex-direction: column; gap: 8px; }
+    /* Hide decorative elements on mobile */
+    .crosshair,
+    .logo-abbrev,
+    .logo-copyright-deco,
+    .footer-copyright-deco,
+    .compass,
+    .card-crosshair,
+    .star-marker,
+    .logo-wide-subtitle,
+    .logo-showcase-meta-readout { display: none; }
+    .hero-readout { display: none; }
+    .mission-readout { display: none; }
+  }
+
+  /* === REDUCED MOTION === */
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-inner,
+    .marquee-inner { animation: none; }
+    .status-strip .status-dot { animation: none; }
+    .step-arrow { transition: none; }
+    .btn-primary .chevron-anim { transition: none; }
+    .btn-primary:hover .chevron-anim { letter-spacing: 0; }
+    .process-step:hover .step-arrow { letter-spacing: 0; }
   }
 </style>
 </head>
@@ -677,50 +1048,47 @@
 <div class="ticker">
   <div class="ticker-inner">
     <span>Automate the dread away</span>
-    <span>/</span>
+    <span>//</span>
     <span>Nashville, Tennessee</span>
-    <span>/</span>
+    <span>//</span>
     <span>Business process automation</span>
-    <span>/</span>
+    <span>//</span>
     <span>Workflow engineering</span>
-    <span>/</span>
+    <span>//</span>
     <span>Systems integration</span>
-    <span>/</span>
+    <span>//</span>
     <span>Automate the dread away</span>
-    <span>/</span>
+    <span>//</span>
     <span>Nashville, Tennessee</span>
-    <span>/</span>
+    <span>//</span>
     <span>Business process automation</span>
-    <span>/</span>
+    <span>//</span>
     <span>Workflow engineering</span>
-    <span>/</span>
+    <span>//</span>
     <span>Systems integration</span>
-    <span>/</span>
+    <span>//</span>
   </div>
 </div>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#home">
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="36" height="36" rx="2" fill="#C8954C"/>
-      <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
-      <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
-      <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
-    </svg>
-    <div class="nav-wordmark">Nashville<br>Automation Co.</div>
-  </a>
-  <div class="nav-links">
-    <a href="#services">Services</a>
-    <a href="#process">Process</a>
-    <a href="#about">About</a>
-  </div>
-</nav>
+<!-- STATUS STRIP -->
+<div class="status-strip">
+  <div><span class="status-dot"></span>Systems operational</div>
+  <div>36.1627&deg; N / 86.7816&deg; W</div>
+  <div>Est. 2026</div>
+</div>
 
 <!-- LOGO SHOWCASE -->
 <section class="logo-showcase">
-  <svg width="72" height="72" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="36" height="36" rx="2" fill="#C8954C"/>
+  <span class="logo-abbrev" aria-hidden="true">(N-A-C)</span>
+
+  <!-- Crosshairs at corners -->
+  <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
+
+  <svg width="72" height="72" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1;">
+    <rect width="36" height="36" rx="2" fill="#E8652B"/>
     <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
     <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
     <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
@@ -733,24 +1101,52 @@
   </div>
 
   <div class="logo-meta">
-    <span>Nashville, TN</span>
-    <span>/</span>
-    <span>Business Automation</span>
-    <span>/</span>
-    <span>Est. 2026</span>
+    <span class="box-label box-label-filled">Business Automation</span>
+    <span class="box-label box-label-filled">Est. 2026</span>
   </div>
+
+  <div class="logo-showcase-meta-readout" aria-hidden="true">
+    Network type: Process-mesh / Decision layer: AI-native / Status: Active
+  </div>
+
+  <span class="logo-copyright-deco" aria-hidden="true">&copy; 2026</span>
 </section>
+
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- HERO -->
 <section class="hero" id="home">
+  <!-- Crosshairs -->
+  <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
+
+  <!-- Compass -->
+  <div class="compass" aria-hidden="true">
+    <span class="compass-n">N</span>
+    <span class="compass-s">S</span>
+    <span class="compass-e">E</span>
+    <span class="compass-w">W</span>
+    <span class="compass-ring"></span>
+    <span class="compass-dot"></span>
+  </div>
+
   <div class="hero-grid">
     <div>
-      <div class="hero-label">Nashville's Premier Automation Partner</div>
+      <div class="hero-label">[ Nashville's Premier Automation Partner ]</div>
       <h1>Automate<br>the <em>dread</em><br>away.</h1>
       <p class="hero-sub">We build systems that eliminate the monotony from your workday. Custom automation, workflow engineering, and intelligent integrations that let you focus on work that actually matters.</p>
       <div class="hero-actions">
-        <a href="mailto:automate@nashvilleautomation.com" class="btn-primary">Get In Touch >>></a>
+        <a href="mailto:automate@nashvilleautomation.io" class="btn-primary">Get In Touch <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
         <a href="#services" class="btn-secondary">View Services</a>
+      </div>
+      <div class="hero-readout" aria-hidden="true">
+        <span>Sector: B2B automation</span>
+        <span>Region: Southeast US</span>
+        <span>Mode: Active deployment</span>
+        <span>Version: 2026.1</span>
       </div>
     </div>
   </div>
@@ -760,31 +1156,34 @@
 <div class="marquee-banner">
   <div class="marquee-inner">
     <span class="marquee-item filled">Workflows</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Integrations</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item filled">AI Agents</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Data Pipelines</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item filled">Process Design</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Custom Software</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item filled">Workflows</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Integrations</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item filled">AI Agents</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Data Pipelines</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item filled">Process Design</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
     <span class="marquee-item">Custom Software</span>
-    <span class="marquee-sep">/</span>
+    <span class="marquee-sep">+</span>
   </div>
 </div>
+
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- SERVICES -->
 <section class="services" id="services">
@@ -798,6 +1197,7 @@
 
   <div class="services-grid">
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">01</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -807,6 +1207,7 @@
     </div>
 
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">02</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m-7-7h6m6 0h6m-16.97-5.97l4.24 4.24m5.46 5.46l4.24 4.24m0-13.94l-4.24 4.24m-5.46 5.46l-4.24 4.24"/></svg>
@@ -816,6 +1217,7 @@
     </div>
 
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">03</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
@@ -825,6 +1227,7 @@
     </div>
 
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">04</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -834,6 +1237,7 @@
     </div>
 
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">05</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -843,6 +1247,7 @@
     </div>
 
     <div class="service-card">
+      <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">06</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
@@ -852,6 +1257,9 @@
     </div>
   </div>
 </section>
+
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- PROCESS -->
 <section class="process" id="process">
@@ -868,19 +1276,19 @@
       <div class="process-step-num">01</div>
       <h4>Audit</h4>
       <p>We map every process in your operation. Where time goes, where errors happen, where humans are doing what machines should.</p>
-      <span class="step-arrow">>>></span>
+      <span class="step-arrow">&gt;&gt;&gt;&gt;</span>
     </div>
     <div class="process-step">
       <div class="process-step-num">02</div>
       <h4>Architect</h4>
       <p>Design the automation blueprint. What gets automated, what stays human, and how everything connects into a single system.</p>
-      <span class="step-arrow">>>></span>
+      <span class="step-arrow">&gt;&gt;&gt;&gt;</span>
     </div>
     <div class="process-step">
       <div class="process-step-num">03</div>
       <h4>Deploy</h4>
       <p>Build and launch in rapid sprints. You see working automation within weeks, not months. Every deployment is tested and monitored.</p>
-      <span class="step-arrow">>>></span>
+      <span class="step-arrow">&gt;&gt;&gt;&gt;</span>
     </div>
     <div class="process-step">
       <div class="process-step-num">04</div>
@@ -889,6 +1297,9 @@
     </div>
   </div>
 </section>
+
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- MISSION -->
 <section class="mission" id="about">
@@ -907,25 +1318,41 @@
     <div class="mission-details">
       <p class="mission-body">Nashville Automation Company exists because most businesses are drowning in repetitive tasks that kill morale and waste talent. We're a team of engineers and operators who build systems that handle the monotony -- so your people can focus on creative, strategic, human work.</p>
       <p class="mission-body">Based in Nashville, we work with businesses across the Southeast and beyond. From healthcare to hospitality, logistics to professional services -- if there's a process that makes you groan, we automate it.</p>
+      <div class="mission-readout" aria-hidden="true">
+        <span>Status: Active</span>
+        <span>Region: Southeast</span>
+        <span>Sectors: Healthcare, Hospitality, Logistics</span>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
+
 <!-- CTA -->
 <section class="cta" id="contact">
-  <div class="cta-label">>>> Ready to automate? <<<</div>
-  <h2>Stop dreading<br>Monday.</h2>
+  <!-- Crosshairs -->
+  <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
+  <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
+
+  <div class="cta-label">[ Ready to Automate ]</div>
+  <h2>Stop Dreading<br>Monday.</h2>
   <p class="cta-sub">Let's talk about what we can automate for your business. Reach out and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
-  <a href="mailto:automate@nashvilleautomation.com" class="cta-email">automate@nashvilleautomation.com</a>
+  <a href="mailto:automate@nashvilleautomation.io" class="cta-email">automate@nashvilleautomation.io</a>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-top">
+  <span class="footer-copyright-deco" aria-hidden="true">&copy; 2026</span>
+
+  <div class="footer-top" style="position:relative;z-index:1;">
     <div>
       <div class="footer-brand">
         <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="36" height="36" rx="2" fill="#C8954C"/>
+          <rect width="36" height="36" rx="2" fill="#E8652B"/>
           <polygon points="18,7.5 19,10.62 22.28,10.61 19.62,12.53 20.65,15.64 18,13.7 15.35,15.64 16.38,12.53 13.72,10.61 17,10.62" fill="#0A0A0A"/>
           <polygon points="12,18.5 13,21.62 16.28,21.61 13.62,23.53 14.65,26.64 12,24.7 9.35,26.64 10.38,23.53 7.72,21.61 11,21.62" fill="#0A0A0A"/>
           <polygon points="24,18.5 25,21.62 28.28,21.61 25.62,23.53 26.65,26.64 24,24.7 21.35,26.64 22.38,23.53 19.72,21.61 23,21.62" fill="#0A0A0A"/>
@@ -937,17 +1364,21 @@
     <div class="footer-cols">
       <div class="footer-col">
         <h5>Navigation</h5>
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#about">About</a>
+        <a href="#services" class="footer-nav-item">Services</a>
+        <a href="#process" class="footer-nav-item">Process</a>
+        <a href="#about" class="footer-nav-item">About</a>
       </div>
       <div class="footer-col">
         <h5>Contact</h5>
-        <a href="mailto:automate@nashvilleautomation.com">automate@nashvilleautomation.com</a>
+        <a href="mailto:automate@nashvilleautomation.io">automate@nashvilleautomation.io</a>
       </div>
     </div>
   </div>
-  <div class="footer-bottom">
+
+  <!-- Barcode divider above copyright -->
+  <div class="barcode-divider" aria-hidden="true" style="margin-bottom:24px;"></div>
+
+  <div class="footer-bottom" style="position:relative;z-index:1;">
     <span>&copy; 2026 Nashville Automation Company. All rights reserved.</span>
   </div>
 </footer>
