@@ -1041,6 +1041,28 @@
     .logo-showcase-meta-readout { display: none; }
     .hero-readout { display: none; }
     .mission-readout { display: none; }
+    /* Fix email button overflow */
+    .cta-email {
+      font-size: clamp(12px, 3.5vw, 18px);
+      padding: 16px 20px;
+      word-break: break-all;
+      max-width: 100%;
+    }
+    /* Smaller subtitle on mobile */
+    .cta-sub {
+      font-size: 15px;
+    }
+    /* Tighter padding on mobile */
+    .hero, .services, .mission, .process, .cta, .logo-showcase, footer {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    nav { padding: 16px; }
+    .status-strip { padding-left: 16px; padding-right: 16px; }
+    /* Footer email overflow */
+    .footer-col a {
+      word-break: break-all;
+    }
   }
 
   /* === REDUCED MOTION === */
