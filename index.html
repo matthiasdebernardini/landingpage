@@ -446,44 +446,6 @@
     border-top: 1px solid var(--border);
   }
 
-  /* Compass rose */
-  .compass {
-    position: absolute;
-    top: 32px;
-    right: 48px;
-    width: 60px;
-    height: 60px;
-    font-family: var(--mono);
-    font-size: 8px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .compass-n { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
-  .compass-s { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
-  .compass-e { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
-  .compass-w { position: absolute; left: 0; top: 50%; transform: translateY(-50%); }
-  .compass-dot {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 6px;
-    height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-  }
-  .compass-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--border-strong);
-    border-radius: 50%;
-  }
-
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -1018,7 +980,6 @@
     .logo-abbrev { right: 24px; }
     .logo-copyright-deco { right: 24px; font-size: 80px; }
     .footer-copyright-deco { right: 24px; font-size: 100px; }
-    .compass { right: 24px; }
   }
 
   @media (max-width: 640px) {
@@ -1034,7 +995,6 @@
     .logo-abbrev,
     .logo-copyright-deco,
     .footer-copyright-deco,
-    .compass,
     .card-crosshair,
     .star-marker,
     .logo-wide-subtitle,
@@ -1101,8 +1061,7 @@
   }
 
   .hero .hero-grid,
-  .hero .crosshair,
-  .hero .compass {
+  .hero .crosshair {
     position: relative;
     z-index: 1;
   }
@@ -1205,16 +1164,6 @@
   <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
-
-  <!-- Compass -->
-  <div class="compass" aria-hidden="true">
-    <span class="compass-n">N</span>
-    <span class="compass-s">S</span>
-    <span class="compass-e">E</span>
-    <span class="compass-w">W</span>
-    <span class="compass-ring"></span>
-    <span class="compass-dot"></span>
-  </div>
 
   <div class="hero-grid">
     <div>
