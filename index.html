@@ -1045,7 +1045,7 @@
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: 0;
-    opacity: 0.4;
+    opacity: 0.7;
     pointer-events: none;
     overflow: hidden;
   }
@@ -1061,7 +1061,6 @@
   }
 
   #ascii-bg table {
-    color: var(--text-dim) !important;
     background: transparent !important;
     font-family: var(--mono) !important;
   }
@@ -1438,7 +1437,7 @@ try {
   if (window.innerWidth < 480) throw new Error('skip');
 
   const { Scene, PerspectiveCamera, WebGLRenderer, PointLight, AmbientLight,
-          Mesh, MeshPhongMaterial, TorusKnotGeometry, IcosahedronGeometry, Group
+          Mesh, MeshPhongMaterial, BoxGeometry, CylinderGeometry, Group
   } = await import('three');
   const { AsciiEffect } = await import('three/addons/effects/AsciiEffect.js');
 
@@ -1446,38 +1445,133 @@ try {
   if (!container) throw new Error('no container');
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(70, container.clientWidth / container.clientHeight, 1, 1000);
-  camera.position.z = 500;
+  const camera = new PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 2000);
+  camera.position.set(0, 350, 500);
+  camera.lookAt(0, 0, 0);
 
   const renderer = new WebGLRenderer({ alpha: true });
 
-  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: 0.15 });
+  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: 0.15, color: true });
   effect.setSize(container.clientWidth, container.clientHeight);
   effect.domElement.style.color = '';
   effect.domElement.style.backgroundColor = 'transparent';
   container.appendChild(effect.domElement);
 
-  const material = new MeshPhongMaterial({ flatShading: true, color: 0xaaaaaa });
+  const orangeMat = new MeshPhongMaterial({ color: 0xE8652B, flatShading: true });
+  const dimMat = new MeshPhongMaterial({ color: 0x9A8A70, flatShading: true });
 
-  const group = new Group();
-  const torusKnot = new Mesh(new TorusKnotGeometry(100, 30, 64, 12), material);
-  const icosahedron = new Mesh(new IcosahedronGeometry(80, 1), material);
-  icosahedron.position.x = 180;
-  icosahedron.position.y = -60;
-  group.add(torusKnot);
-  group.add(icosahedron);
-  scene.add(group);
+  // --- Conveyor belt ---
+  const beltGroup = new Group();
 
-  const light1 = new PointLight(0xffffff, 500000);
-  light1.position.set(500, 500, 500);
+  // Belt surface
+  const beltSurface = new Mesh(new BoxGeometry(1400, 8, 80), dimMat);
+  beltSurface.position.y = -4;
+  beltGroup.add(beltSurface);
+
+  // Two side rails
+  const railL = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
+  railL.position.set(0, 0, 43);
+  beltGroup.add(railL);
+  const railR = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
+  railR.position.set(0, 0, -43);
+  beltGroup.add(railR);
+
+  // 8 roller marks
+  const rollers = [];
+  for (let i = 0; i < 8; i++) {
+    const roller = new Mesh(new BoxGeometry(4, 9, 76), dimMat);
+    roller.position.set(-560 + i * 160, -4, 0);
+    beltGroup.add(roller);
+    rollers.push(roller);
+  }
+
+  scene.add(beltGroup);
+
+  // --- Conveyor items (6 orange boxes) ---
+  const items = [];
+  for (let i = 0; i < 6; i++) {
+    const box = new Mesh(new BoxGeometry(35, 35, 35), orangeMat);
+    box.position.set(-700 + i * (1400 / 6), 18, 0);
+    scene.add(box);
+    items.push(box);
+  }
+
+  // --- Robot arms (3 articulating arms) ---
+  const arms = [];
+  const armXPositions = [-300, 0, 300];
+  const armPhases = [0, Math.PI * 2 / 3, Math.PI * 4 / 3];
+
+  for (let i = 0; i < 3; i++) {
+    const armGroup = new Group();
+    armGroup.position.set(armXPositions[i], 0, -80);
+
+    // Base cylinder
+    const base = new Mesh(new CylinderGeometry(30, 35, 50, 8), dimMat);
+    base.position.y = 25;
+    armGroup.add(base);
+
+    // Turret group (Y rotation — swivel)
+    const turretGroup = new Group();
+    turretGroup.position.y = 50;
+    armGroup.add(turretGroup);
+
+    const turretCap = new Mesh(new CylinderGeometry(25, 25, 16, 8), dimMat);
+    turretGroup.add(turretCap);
+
+    // Shoulder group (Z rotation — tilt)
+    const shoulderGroup = new Group();
+    shoulderGroup.position.y = 8;
+    turretGroup.add(shoulderGroup);
+
+    const upperArm = new Mesh(new BoxGeometry(20, 100, 20), dimMat);
+    upperArm.position.y = 50;
+    shoulderGroup.add(upperArm);
+
+    // Elbow group (Z rotation — bend)
+    const elbowGroup = new Group();
+    elbowGroup.position.y = 100;
+    shoulderGroup.add(elbowGroup);
+
+    const forearm = new Mesh(new BoxGeometry(16, 80, 16), dimMat);
+    forearm.position.y = 40;
+    elbowGroup.add(forearm);
+
+    // Gripper group
+    const gripperGroup = new Group();
+    gripperGroup.position.y = 80;
+    elbowGroup.add(gripperGroup);
+
+    const fingerL = new Mesh(new BoxGeometry(6, 30, 6), orangeMat);
+    fingerL.position.set(-8, 15, 0);
+    gripperGroup.add(fingerL);
+
+    const fingerR = new Mesh(new BoxGeometry(6, 30, 6), orangeMat);
+    fingerR.position.set(8, 15, 0);
+    gripperGroup.add(fingerR);
+
+    scene.add(armGroup);
+    arms.push({
+      turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR,
+      phase: armPhases[i],
+      swayAmp: 0.3 + i * 0.05,
+      shoulderAmp: 0.25 + i * 0.03,
+      elbowAmp: 0.35 + i * 0.04,
+      speed: 0.0012 + i * 0.0001,
+    });
+  }
+
+  // --- Lighting ---
+  const light1 = new PointLight(0xffffff, 400000);
+  light1.position.set(400, 500, 400);
   scene.add(light1);
 
-  const light2 = new PointLight(0xffffff, 250000);
-  light2.position.set(-500, -300, 300);
+  const light2 = new PointLight(0xffffff, 200000);
+  light2.position.set(-300, 200, 300);
   scene.add(light2);
 
-  scene.add(new AmbientLight(0x222222));
+  scene.add(new AmbientLight(0x333333));
 
+  // --- Animation infrastructure ---
   let speedMultiplier = 1;
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (motionQuery.matches) speedMultiplier = 0.15;
@@ -1490,18 +1584,49 @@ try {
   );
   observer.observe(container.closest('.hero'));
 
+  const beltSpeed = 0.06; // units per ms
+
   let prev = performance.now();
   function animate(now) {
     requestAnimationFrame(animate);
     if (!isVisible) { prev = now; return; }
     const dt = now - prev;
     prev = now;
-    const rx = 0.0002 * dt * speedMultiplier;
-    const ry = 0.0003 * dt * speedMultiplier;
-    torusKnot.rotation.x += rx;
-    torusKnot.rotation.y += ry;
-    icosahedron.rotation.x += rx * 0.7;
-    icosahedron.rotation.y -= ry * 0.5;
+    const s = speedMultiplier;
+
+    // Conveyor items slide right and wrap
+    for (const item of items) {
+      item.position.x += beltSpeed * dt * s;
+      if (item.position.x > 700) item.position.x -= 1400;
+      item.rotation.y += 0.0008 * dt * s;
+    }
+
+    // Roller marks move with belt and wrap
+    for (const roller of rollers) {
+      roller.position.x += beltSpeed * dt * s;
+      if (roller.position.x > 700) roller.position.x -= 1400;
+    }
+
+    // Robot arm articulation
+    const t = now * 0.001; // time in seconds
+    for (const arm of arms) {
+      const cycle = t * arm.speed * 1000 * s + arm.phase;
+
+      // Turret swivel (left/right)
+      arm.turretGroup.rotation.y = Math.sin(cycle) * arm.swayAmp;
+
+      // Shoulder tilt (toward/away from belt)
+      arm.shoulderGroup.rotation.z = -0.4 + Math.sin(cycle * 1.1) * arm.shoulderAmp;
+
+      // Elbow counter-bend
+      arm.elbowGroup.rotation.z = 0.6 + Math.cos(cycle * 1.1) * arm.elbowAmp;
+
+      // Gripper open/close at 2x speed
+      const grip = Math.sin(cycle * 2) * 0.15;
+      arm.fingerL.position.x = -8 - grip * 30;
+      arm.fingerR.position.x = 8 + grip * 30;
+    }
+
     effect.render(scene, camera);
   }
   requestAnimationFrame(animate);
