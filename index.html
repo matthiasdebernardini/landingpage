@@ -1040,7 +1040,55 @@
     .btn-primary:hover .chevron-anim { letter-spacing: 0; }
     .process-step:hover .step-arrow { letter-spacing: 0; }
   }
+  /* === ASCII BACKGROUND === */
+  #ascii-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    opacity: 0.4;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  #ascii-bg::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  #ascii-bg table {
+    color: var(--text-dim) !important;
+    background: transparent !important;
+    font-family: var(--mono) !important;
+  }
+
+  .hero .hero-grid,
+  .hero .crosshair,
+  .hero .compass {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 640px) {
+    #ascii-bg { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #ascii-bg { opacity: 0.15; }
+  }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -1117,6 +1165,8 @@
 
 <!-- HERO -->
 <section class="hero" id="home">
+  <div id="ascii-bg" aria-hidden="true"></div>
+
   <!-- Crosshairs -->
   <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
@@ -1382,6 +1432,93 @@
     <span>&copy; 2026 Nashville Automation Company. All rights reserved.</span>
   </div>
 </footer>
+
+<script type="module">
+try {
+  if (window.innerWidth < 480) throw new Error('skip');
+
+  const { Scene, PerspectiveCamera, WebGLRenderer, PointLight, AmbientLight,
+          Mesh, MeshPhongMaterial, TorusKnotGeometry, IcosahedronGeometry, Group
+  } = await import('three');
+  const { AsciiEffect } = await import('three/addons/effects/AsciiEffect.js');
+
+  const container = document.getElementById('ascii-bg');
+  if (!container) throw new Error('no container');
+
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(70, container.clientWidth / container.clientHeight, 1, 1000);
+  camera.position.z = 500;
+
+  const renderer = new WebGLRenderer({ alpha: true });
+
+  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: 0.15 });
+  effect.setSize(container.clientWidth, container.clientHeight);
+  effect.domElement.style.color = '';
+  effect.domElement.style.backgroundColor = 'transparent';
+  container.appendChild(effect.domElement);
+
+  const material = new MeshPhongMaterial({ flatShading: true, color: 0xaaaaaa });
+
+  const group = new Group();
+  const torusKnot = new Mesh(new TorusKnotGeometry(100, 30, 64, 12), material);
+  const icosahedron = new Mesh(new IcosahedronGeometry(80, 1), material);
+  icosahedron.position.x = 180;
+  icosahedron.position.y = -60;
+  group.add(torusKnot);
+  group.add(icosahedron);
+  scene.add(group);
+
+  const light1 = new PointLight(0xffffff, 500000);
+  light1.position.set(500, 500, 500);
+  scene.add(light1);
+
+  const light2 = new PointLight(0xffffff, 250000);
+  light2.position.set(-500, -300, 300);
+  scene.add(light2);
+
+  scene.add(new AmbientLight(0x222222));
+
+  let speedMultiplier = 1;
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (motionQuery.matches) speedMultiplier = 0.15;
+  motionQuery.addEventListener('change', (e) => { speedMultiplier = e.matches ? 0.15 : 1; });
+
+  let isVisible = true;
+  const observer = new IntersectionObserver(
+    ([entry]) => { isVisible = entry.isIntersecting; },
+    { threshold: 0 }
+  );
+  observer.observe(container.closest('.hero'));
+
+  let prev = performance.now();
+  function animate(now) {
+    requestAnimationFrame(animate);
+    if (!isVisible) { prev = now; return; }
+    const dt = now - prev;
+    prev = now;
+    const rx = 0.0002 * dt * speedMultiplier;
+    const ry = 0.0003 * dt * speedMultiplier;
+    torusKnot.rotation.x += rx;
+    torusKnot.rotation.y += ry;
+    icosahedron.rotation.x += rx * 0.7;
+    icosahedron.rotation.y -= ry * 0.5;
+    effect.render(scene, camera);
+  }
+  requestAnimationFrame(animate);
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 480) { container.style.display = 'none'; return; }
+    container.style.display = '';
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    effect.setSize(w, h);
+  });
+} catch (e) {
+  // Graceful degradation — page works fine without the effect
+}
+</script>
 
 </body>
 </html>
