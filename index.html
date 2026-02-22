@@ -1526,15 +1526,15 @@ try {
   for (let i = 0; i < 6; i++) {
     const box = new Mesh(new BoxGeometry(40, 40, 40), orangeMat);
     box.position.set(-700 + i * (1400 / 6), 20, 0);
+    box.userData = { claimed: false };
     scene.add(box);
     items.push(box);
   }
 
   // --- Robot arms (3) — each positioned beside the belt ---
-  // Arms sit to the side (z=-100) and swing Z-rotation to lean over the belt
+  // Arms at z=-100, IK drives X-rotation to reach forward to belt at z=0
   const arms = [];
   const armXPositions = [-300, 0, 300];
-  const armPhases = [0, 0.333, 0.667];
 
   for (let i = 0; i < 3; i++) {
     const armGroup = new Group();
@@ -1553,7 +1553,7 @@ try {
     const turretCap = new Mesh(new CylinderGeometry(28, 28, 20, 8), dimMat);
     turretGroup.add(turretCap);
 
-    // Shoulder group (Z rotation — lean toward/away from belt)
+    // Shoulder group (X rotation — swing forward/backward toward belt)
     const shoulderGroup = new Group();
     shoulderGroup.position.y = 10;
     turretGroup.add(shoulderGroup);
@@ -1562,7 +1562,7 @@ try {
     upperArm.position.y = 55;
     shoulderGroup.add(upperArm);
 
-    // Elbow group (Z rotation — bend)
+    // Elbow group (X rotation — bend forearm down)
     const elbowGroup = new Group();
     elbowGroup.position.y = 110;
     shoulderGroup.add(elbowGroup);
@@ -1593,42 +1593,143 @@ try {
     scene.add(armGroup);
     arms.push({
       turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR, heldBox, armGroup,
-      phase: armPhases[i],
+      armX: armXPositions[i],
+      state: 'idle', stateTime: 0,
+      idleCooldown: i * 2600 + 200,
+      targetBox: null,
+      currentTY: 0, currentSX: 0, currentEX: 0.2, currentGrip: 1,
+      goalTY: 0, goalSX: 0, goalEX: 0.2, goalGrip: 1,
     });
   }
 
-  // Pick-and-place keyframes
-  // ty = turret Y, sz = shoulder Z, ez = elbow Z, g = grip (1=open), b = box held
-  // Shoulder Z: positive = lean right (toward belt from behind-left), negative = lean left
-  // The arm leans FORWARD via turret Y rotation combined with dramatic shoulder Z lean
-  const KF = [
-    { t: 0.00, ty:  0.6,  sz: 0.0,  ez:  0.2, g: 1, b: false }, // upright, facing belt-ward
-    { t: 0.15, ty:  0.6,  sz: 1.4,  ez: -1.8, g: 1, b: false }, // reaching down to belt
-    { t: 0.20, ty:  0.6,  sz: 1.4,  ez: -1.8, g: 1, b: false }, // pause at belt
-    { t: 0.28, ty:  0.6,  sz: 1.4,  ez: -1.8, g: 0, b: true  }, // GRAB — gripper closes, box appears
-    { t: 0.45, ty:  0.0,  sz: 0.0,  ez:  0.2, g: 0, b: true  }, // lift up with box
-    { t: 0.58, ty: -0.6,  sz: 1.2,  ez: -1.6, g: 0, b: true  }, // swing behind, reach down
-    { t: 0.66, ty: -0.6,  sz: 1.2,  ez: -1.6, g: 1, b: false }, // RELEASE — gripper opens, box gone
-    { t: 0.80, ty:  0.0,  sz: 0.0,  ez:  0.2, g: 1, b: false }, // return upright
-    { t: 1.00, ty:  0.6,  sz: 0.0,  ez:  0.2, g: 1, b: false }, // back to start
-  ];
+  // IK solver for 2-link arm
+  const L1 = 110, L2 = 90;
+  const ARM_Z = -100;
 
-  function sampleKF(t) {
-    t = ((t % 1) + 1) % 1;
-    let i0 = KF.length - 2;
-    for (let i = 0; i < KF.length - 1; i++) {
-      if (t >= KF[i].t && t < KF[i + 1].t) { i0 = i; break; }
+  function solveIK(targetX, targetY, targetZ, armX) {
+    const dx = targetX - armX;
+    const dz = targetZ - ARM_Z;
+    const ty = Math.atan2(dx, dz);
+
+    const horizontalDist = Math.sqrt(dx * dx + dz * dz);
+    const verticalDist = targetY - 70; // shoulder world Y = 60 + 10
+    const d = Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist);
+
+    const maxReach = L1 + L2 - 5;
+    const minReach = Math.abs(L1 - L2) + 5;
+    const clamped = Math.max(minReach, Math.min(maxReach, d));
+
+    const cosQ2 = (clamped * clamped - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+    const q2 = Math.acos(Math.max(-1, Math.min(1, cosQ2)));
+
+    const q1 = Math.atan2(horizontalDist, verticalDist)
+             - Math.atan2(L2 * Math.sin(q2), L1 + L2 * Math.cos(q2));
+
+    return { ty, sx: q1, ex: q2 };
+  }
+
+  function lerpAngle(current, goal, speed, dt) {
+    return current + (goal - current) * (1 - Math.exp(-speed * dt / 1000));
+  }
+
+  function selectBox(arm, boxes) {
+    let best = null, bestDist = Infinity;
+    for (const box of boxes) {
+      if (box.userData.claimed || !box.visible) continue;
+      const relX = box.position.x - arm.armX;
+      if (relX < -200 || relX > 80) continue;
+      const dist = Math.abs(relX);
+      if (dist < bestDist) { bestDist = dist; best = box; }
     }
-    const k0 = KF[i0], k1 = KF[i0 + 1];
-    const u = (t - k0.t) / (k1.t - k0.t);
-    const s = u * u * (3 - 2 * u); // smoothstep
-    return {
-      ty: k0.ty + (k1.ty - k0.ty) * s,
-      sz: k0.sz + (k1.sz - k0.sz) * s,
-      ez: k0.ez + (k1.ez - k0.ez) * s,
-      g:  k0.g  + (k1.g  - k0.g)  * s,
-      b:  k0.b,
-    };
+    return best;
+  }
+
+  function updateArmState(arm, dt, boxes) {
+    arm.stateTime += dt;
+
+    switch (arm.state) {
+      case 'idle': {
+        arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 1;
+        arm.heldBox.visible = false;
+        if (arm.stateTime >= arm.idleCooldown) {
+          const box = selectBox(arm, boxes);
+          if (box) {
+            box.userData.claimed = true;
+            arm.targetBox = box;
+            arm.state = 'reaching'; arm.stateTime = 0;
+          }
+        }
+        break;
+      }
+      case 'reaching': {
+        if (!arm.targetBox || !arm.targetBox.visible) {
+          if (arm.targetBox) arm.targetBox.userData.claimed = false;
+          arm.targetBox = null;
+          arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 200;
+          break;
+        }
+        const ik = solveIK(arm.targetBox.position.x, arm.targetBox.position.y, arm.targetBox.position.z, arm.armX);
+        arm.goalTY = ik.ty; arm.goalSX = ik.sx; arm.goalEX = ik.ex; arm.goalGrip = 1;
+        const dTY = Math.abs(arm.currentTY - arm.goalTY);
+        const dSX = Math.abs(arm.currentSX - arm.goalSX);
+        const dEX = Math.abs(arm.currentEX - arm.goalEX);
+        if (dTY < 0.05 && dSX < 0.05 && dEX < 0.05) {
+          arm.state = 'grabbing'; arm.stateTime = 0;
+        }
+        if (arm.stateTime > 3000) {
+          arm.targetBox.userData.claimed = false;
+          arm.targetBox = null;
+          arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 500;
+        }
+        break;
+      }
+      case 'grabbing': {
+        arm.goalGrip = 0;
+        if (arm.stateTime >= 200) {
+          arm.heldBox.visible = true;
+          if (arm.targetBox) arm.targetBox.visible = false;
+          arm.state = 'lifting'; arm.stateTime = 0;
+        }
+        break;
+      }
+      case 'lifting': {
+        arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 0;
+        if (arm.stateTime >= 800) {
+          arm.state = 'dropping'; arm.stateTime = 0;
+        }
+        break;
+      }
+      case 'dropping': {
+        const dropIK = solveIK(arm.armX, 40, -160, arm.armX);
+        arm.goalTY = dropIK.ty; arm.goalSX = dropIK.sx; arm.goalEX = dropIK.ex; arm.goalGrip = 0;
+        if (arm.stateTime >= 1000) {
+          arm.state = 'releasing'; arm.stateTime = 0;
+        }
+        break;
+      }
+      case 'releasing': {
+        arm.goalGrip = 1;
+        arm.heldBox.visible = false;
+        if (arm.stateTime >= 200) {
+          if (arm.targetBox) {
+            arm.targetBox.position.x = -700;
+            arm.targetBox.visible = true;
+            arm.targetBox.userData.claimed = false;
+            arm.targetBox = null;
+          }
+          arm.state = 'returning'; arm.stateTime = 0;
+        }
+        break;
+      }
+      case 'returning': {
+        arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 1;
+        if (arm.stateTime >= 600) {
+          arm.state = 'idle'; arm.stateTime = 0;
+          arm.idleCooldown = 500 + Math.random() * 1500;
+        }
+        break;
+      }
+    }
   }
 
   // --- Lighting (bright for high ASCII contrast) ---
@@ -1671,6 +1772,7 @@ try {
 
     // Conveyor items slide right and wrap
     for (const item of items) {
+      if (item.userData.claimed) continue;
       item.position.x += beltSpeed * dt * s;
       if (item.position.x > 700) item.position.x -= 1400;
       item.rotation.y += 0.0008 * dt * s;
@@ -1682,27 +1784,19 @@ try {
       if (roller.position.x > 700) roller.position.x -= 1400;
     }
 
-    // Robot arm pick-and-place (keyframe driven)
+    // Robot arm pick-and-place (IK driven)
     for (const arm of arms) {
-      const cycle = now * 0.00012 * s + arm.phase; // ~8s per cycle
-      const p = sampleKF(cycle);
-
-      // Turret swivels front/back (toward belt vs behind)
-      arm.turretGroup.rotation.y = p.ty;
-
-      // Shoulder leans over (dramatic sweep visible from camera)
-      arm.shoulderGroup.rotation.z = p.sz;
-
-      // Elbow counter-bends (forearm reaches down)
-      arm.elbowGroup.rotation.z = p.ez;
-
-      // Gripper open/close
-      const spread = p.g * 14;
+      updateArmState(arm, dt * s, items);
+      arm.currentTY = lerpAngle(arm.currentTY, arm.goalTY, 6, dt * s);
+      arm.currentSX = lerpAngle(arm.currentSX, arm.goalSX, 6, dt * s);
+      arm.currentEX = lerpAngle(arm.currentEX, arm.goalEX, 6, dt * s);
+      arm.currentGrip = lerpAngle(arm.currentGrip, arm.goalGrip, 10, dt * s);
+      arm.turretGroup.rotation.y = arm.currentTY;
+      arm.shoulderGroup.rotation.x = arm.currentSX;
+      arm.elbowGroup.rotation.x = arm.currentEX;
+      const spread = arm.currentGrip * 14;
       arm.fingerL.position.x = -6 - spread;
       arm.fingerR.position.x = 6 + spread;
-
-      // Held box — big orange box appears in gripper when grabbed
-      arm.heldBox.visible = p.b;
     }
 
     effect.render(scene, camera);
