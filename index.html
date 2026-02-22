@@ -1432,6 +1432,37 @@ try {
 
   scene.add(beltGroup);
 
+  // --- Exit conveyor belts (perpendicular, one behind each arm) ---
+  const armXPositions = [-300, 0, 300];
+  const exitRollers = [];
+  for (let i = 0; i < 3; i++) {
+    const ax = armXPositions[i];
+
+    // Belt surface
+    const exitBelt = new Mesh(new BoxGeometry(80, 8, 400), dimMat);
+    exitBelt.position.set(ax, -4, -350);
+    scene.add(exitBelt);
+
+    // Side rails
+    const exitRailL = new Mesh(new BoxGeometry(6, 12, 400), dimMat);
+    exitRailL.position.set(ax - 43, 0, -350);
+    scene.add(exitRailL);
+
+    const exitRailR = new Mesh(new BoxGeometry(6, 12, 400), dimMat);
+    exitRailR.position.set(ax + 43, 0, -350);
+    scene.add(exitRailR);
+
+    // Roller marks (4 per belt)
+    const eRollers = [];
+    for (let j = 0; j < 4; j++) {
+      const roller = new Mesh(new BoxGeometry(76, 9, 4), dimMat);
+      roller.position.set(ax, -4, -200 - j * 100);
+      scene.add(roller);
+      eRollers.push(roller);
+    }
+    exitRollers.push(eRollers);
+  }
+
   // --- Conveyor items (6 orange boxes) ---
   const items = [];
   for (let i = 0; i < 6; i++) {
@@ -1442,10 +1473,20 @@ try {
     items.push(box);
   }
 
+  // --- Exit boxes (one per arm, for sliding animation) ---
+  const exitBoxes = [];
+  for (let i = 0; i < 3; i++) {
+    const box = new Mesh(new BoxGeometry(40, 40, 40), orangeMat);
+    box.position.set(armXPositions[i], 20, -160);
+    box.visible = false;
+    box.userData = { sliding: false };
+    scene.add(box);
+    exitBoxes.push(box);
+  }
+
   // --- Robot arms (3) — each positioned beside the belt ---
   // Arms at z=-100, IK drives X-rotation to reach forward to belt at z=0
   const arms = [];
-  const armXPositions = [-300, 0, 300];
 
   for (let i = 0; i < 3; i++) {
     const armGroup = new Group();
@@ -1505,6 +1546,7 @@ try {
     arms.push({
       turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR, heldBox, armGroup,
       armX: armXPositions[i],
+      exitBox: exitBoxes[i],
       state: 'idle', stateTime: 0,
       idleCooldown: i * 2600 + 200,
       targetBox: null,
@@ -1622,6 +1664,12 @@ try {
         arm.goalGrip = 1;
         arm.heldBox.visible = false;
         if (arm.stateTime >= 200) {
+          // Spawn exit box at drop position
+          arm.exitBox.position.set(arm.armX, 20, -160);
+          arm.exitBox.visible = true;
+          arm.exitBox.userData.sliding = true;
+          arm.exitBox.rotation.y = 0;
+          // Reset original belt box
           if (arm.targetBox) {
             arm.targetBox.position.x = -700;
             arm.targetBox.visible = true;
@@ -1708,6 +1756,25 @@ try {
       const spread = arm.currentGrip * 14;
       arm.fingerL.position.x = -6 - spread;
       arm.fingerR.position.x = 6 + spread;
+    }
+
+    // Exit boxes slide away on perpendicular belts
+    for (const box of exitBoxes) {
+      if (!box.userData.sliding) continue;
+      box.position.z -= beltSpeed * dt * s;
+      box.rotation.y += 0.0008 * dt * s;
+      if (box.position.z < -550) {
+        box.visible = false;
+        box.userData.sliding = false;
+      }
+    }
+
+    // Exit belt roller marks animate
+    for (const rollerSet of exitRollers) {
+      for (const roller of rollerSet) {
+        roller.position.z -= beltSpeed * dt * s;
+        if (roller.position.z < -550) roller.position.z += 400;
+      }
     }
 
     effect.render(scene, camera);
