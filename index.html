@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nashville Automation Company</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Custom automation, workflow engineering, and intelligent integrations that let you focus on work that actually matters.">
+<meta name="description" content="We build systems that eliminate the monotony from your workday.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nashvilleautomation.io/">
 <meta property="og:title" content="Nashville Automation Company">
-<meta property="og:description" content="Automate the dread away. Custom automation, workflow engineering, and intelligent integrations.">
+<meta property="og:description" content="We build systems that eliminate the monotony from your workday.">
 <meta property="og:image" content="https://nashvilleautomation.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Nashville Automation Company">
-<meta name="twitter:description" content="Automate the dread away. Custom automation, workflow engineering, and intelligent integrations.">
+<meta name="twitter:description" content="We build systems that eliminate the monotony from your workday.">
 <meta name="twitter:image" content="https://nashvilleautomation.io/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Space+Grotesk:wght@400&family=Space+Mono:wght@400;700&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -41,7 +41,6 @@
     --crosshair: rgba(200,184,154,0.12);
     --mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
     --sans: 'Space Grotesk', -apple-system, sans-serif;
-    --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
     --condensed: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   }
 
@@ -68,7 +67,6 @@
       repeating-linear-gradient(0deg, rgba(200,184,154,0.025) 0px, rgba(200,184,154,0.025) 1px, transparent 1px, transparent 20px);
     pointer-events: none;
     z-index: 1;
-    will-change: transform;
   }
 
   /* === SCANLINE OVERLAY === */
@@ -88,7 +86,7 @@
   }
 
   /* === ALL CONTENT ABOVE GRID === */
-  .ticker, nav, section, .marquee-banner, footer, .status-strip {
+  section, footer {
     position: relative;
     z-index: 2;
   }
@@ -103,30 +101,10 @@
     line-height: 1;
     user-select: none;
   }
-  .crosshair-accent { color: var(--accent-dim); }
 
   /* === BRACKET NOTATION FOR SECTION LABELS === */
   .section-label::before { content: '[ '; }
   .section-label::after { content: ' ]'; }
-
-  /* === BOXED LABELS === */
-  .box-label {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 6px 14px;
-  }
-  .box-label-filled {
-    background: var(--accent);
-    color: var(--bg-deep);
-  }
-  .box-label-bordered {
-    border: 1px solid var(--border-strong);
-    color: var(--text-dim);
-  }
 
   /* === BARCODE DIVIDER === */
   .barcode-divider {
@@ -146,64 +124,32 @@
     opacity: 0.5;
   }
 
-  /* === STAR MARKER === */
-  .star-marker {
-    font-family: var(--mono);
-    font-size: 18px;
-    color: var(--accent);
-    line-height: 1;
-  }
 
-  /* === TICKER BAR === */
-  .ticker {
-    background: var(--accent);
-    color: var(--bg-deep);
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 10px 0;
+
+
+  /* === HERO === */
+  .hero {
+    min-height: 100vh;
+    padding: 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
     overflow: hidden;
-    white-space: nowrap;
-    border-bottom: 2px solid var(--bg-deep);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  .ticker-inner {
-    display: inline-block;
-    animation: ticker 30s linear infinite;
-  }
-
-  .ticker-inner span {
-    padding: 0 40px;
-  }
-
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* === NAV === */
-  nav {
+  .hero-logo-lockup {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 20px 48px;
-    background: var(--bg-deep);
-    border-bottom: 1px solid var(--border-strong);
-    z-index: 10;
+    gap: 12px;
+    position: absolute;
+    top: 48px;
+    left: 48px;
+    z-index: 1;
   }
 
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
-  }
-
-  .nav-logo svg { flex-shrink: 0; }
-
-  .nav-wordmark {
+  .hero-logo-text {
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 700;
@@ -213,212 +159,14 @@
     line-height: 1.3;
   }
 
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
-
-  .nav-links a {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--accent); }
-
-  /* === STATUS STRIP === */
-  .status-strip {
-    background: var(--bg-deep);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-  .status-strip .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* === LOGO SHOWCASE === */
-  .logo-showcase {
-    min-height: calc(100vh - 100px);
-    padding: 48px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .logo-showcase::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .logo-showcase > * { position: relative; z-index: 1; }
-
-  .logo-wide-subtitle {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.6em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-align: center;
-    width: 100%;
-  }
-
-  .logo-abbrev {
-    position: absolute;
-    top: 32px;
-    right: 48px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    z-index: 1;
-  }
-
-  .logo-lockup {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-
-  .logo-lockup svg {
-    flex-shrink: 0;
-    width: clamp(150px, 25vw, 370px);
-    height: clamp(150px, 25vw, 370px);
-  }
-
-  .logo-name-large {
-    font-family: var(--condensed);
-    font-size: clamp(56px, 9vw, 140px);
-    font-weight: 900;
-    letter-spacing: 0.02em;
-    line-height: 0.88;
-    text-align: left;
-    text-transform: uppercase;
-  }
-
-  .logo-name-large .nashville {
-    display: block;
-    color: var(--text-bright);
-  }
-
-  .logo-name-large .automation {
-    display: block;
-    color: var(--accent);
-  }
-
-  .logo-name-large .company {
-    display: block;
-    color: var(--text-bright);
-  }
-
-  .logo-meta {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .logo-showcase-meta-readout {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-align: center;
-    margin-top: 8px;
-  }
-
-  .logo-copyright-deco {
-    position: absolute;
-    bottom: 20px;
-    right: 48px;
-    font-family: var(--condensed);
-    font-size: 120px;
-    font-weight: 900;
-    color: var(--border-strong);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.4;
-    z-index: 0;
-  }
-
-  /* === HERO === */
-  .hero {
-    padding: 80px 48px 60px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-
   .hero-grid {
     max-width: 720px;
   }
 
-  .hero-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .hero-label::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    display: inline-block;
-  }
 
   .hero h1 {
     font-family: var(--condensed);
-    font-size: clamp(56px, 7vw, 96px);
+    font-size: clamp(64px, 9vw, 120px);
     font-weight: 900;
     line-height: 0.92;
     letter-spacing: 0.02em;
@@ -448,18 +196,6 @@
     margin-bottom: 32px;
   }
 
-  .hero-readout {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
 
   .btn-primary {
     display: inline-flex;
@@ -512,50 +248,6 @@
     color: var(--accent);
   }
 
-  /* === MARQUEE BANNER === */
-  .marquee-banner {
-    padding: 28px 0;
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    white-space: nowrap;
-    background: var(--bg-deep);
-  }
-
-  .marquee-inner {
-    display: inline-flex;
-    animation: marquee 20s linear infinite;
-  }
-
-  .marquee-item {
-    font-family: var(--condensed);
-    font-size: clamp(48px, 5vw, 72px);
-    font-weight: 900;
-    letter-spacing: 0.02em;
-    color: var(--border);
-    padding: 0 24px;
-    -webkit-text-stroke: 1px var(--border-strong);
-    text-transform: uppercase;
-    transition: color 0.3s;
-  }
-
-  .marquee-item.filled {
-    color: var(--text-bright);
-    -webkit-text-stroke: none;
-  }
-
-  .marquee-sep {
-    color: var(--accent);
-    padding: 0 16px;
-    font-family: var(--mono);
-    font-size: 24px;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
 
   /* === SECTIONS SHARED === */
   .section-header {
@@ -604,7 +296,7 @@
 
   .services-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1px;
     background: var(--border);
     border: 1px solid var(--border);
@@ -821,16 +513,6 @@
 
   .cta > * { position: relative; z-index: 1; }
 
-  .cta-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-  }
-
   .cta h2 {
     font-family: var(--condensed);
     font-size: clamp(40px, 5vw, 72px);
@@ -852,22 +534,26 @@
     line-height: 1.6;
   }
 
-  .cta-email {
-    font-family: var(--mono);
-    font-size: clamp(18px, 3vw, 28px);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-    text-decoration: none;
-    border: 2px solid var(--accent);
+  .btn-primary-lg {
     padding: 20px 40px;
-    display: inline-block;
-    transition: all 0.2s;
+    font-size: 14px;
   }
 
-  .cta-email:hover {
-    background: var(--accent);
-    color: var(--bg-deep);
+  .cta-email-secondary {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 20px;
+  }
+
+  .cta-email-secondary a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .cta-email-secondary a:hover {
+    color: var(--accent-bright);
   }
 
   /* === FOOTER === */
@@ -879,74 +565,6 @@
     overflow: hidden;
   }
 
-  .footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 48px;
-    padding-bottom: 48px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .footer-brand {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .footer-tagline {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-top: 12px;
-  }
-
-  .footer-cols {
-    display: flex;
-    gap: 64px;
-  }
-
-  .footer-col h5 {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text);
-    margin-bottom: 16px;
-  }
-
-  .footer-col a {
-    display: block;
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--text-dim);
-    text-decoration: none;
-    padding: 4px 0;
-    transition: color 0.2s;
-  }
-
-  .footer-col a:hover { color: var(--accent); }
-
-  .footer-col a.footer-nav-item {
-    display: block;
-    border: 1px solid var(--border-strong);
-    padding: 10px 24px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-decoration: none;
-    transition: all 0.2s;
-    margin-bottom: 6px;
-  }
-  .footer-nav-item:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
 
   .footer-bottom {
     display: flex;
@@ -963,20 +581,6 @@
     color: var(--text-dim);
   }
 
-  .footer-copyright-deco {
-    position: absolute;
-    bottom: -10px;
-    right: 48px;
-    font-family: var(--condensed);
-    font-size: 140px;
-    font-weight: 900;
-    color: var(--border-strong);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.3;
-    z-index: 0;
-  }
 
   /* === RESPONSIVE === */
   @media (max-width: 1024px) {
@@ -987,14 +591,8 @@
     .process-step:nth-child(3) { border-top: 1px solid var(--border); }
     .process-step:nth-child(4) { border-top: 1px solid var(--border); }
     .mission-grid { grid-template-columns: 1fr; gap: 40px; }
-    nav { padding: 16px 24px; }
-    .hero, .services, .mission, .process, .cta, .logo-showcase, footer { padding-left: 24px; padding-right: 24px; }
-    .footer-top { flex-direction: column; gap: 32px; }
-    .nav-links { display: none; }
-    .status-strip { padding-left: 24px; padding-right: 24px; }
-    .logo-abbrev { right: 24px; }
-    .logo-copyright-deco { right: 24px; font-size: 80px; }
-    .footer-copyright-deco { right: 24px; font-size: 100px; }
+    .hero, .services, .mission, .process, .cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-logo-lockup { left: 24px; }
   }
 
   @media (max-width: 640px) {
@@ -1003,66 +601,29 @@
     .process-step:last-child { border-bottom: none; }
     .step-arrow { display: none; }
     .hero-actions { flex-direction: column; align-items: flex-start; }
-    .footer-cols { flex-direction: column; gap: 32px; }
-    .logo-meta { flex-direction: column; gap: 8px; }
     /* Hide decorative elements on mobile */
     .crosshair,
-    .logo-abbrev,
-    .logo-copyright-deco,
-    .footer-copyright-deco,
-    .card-crosshair,
-    .star-marker,
-    .logo-wide-subtitle,
-    .logo-showcase-meta-readout { display: none; }
-    .hero-readout { display: none; }
+    .card-crosshair { display: none; }
     .mission-readout { display: none; }
-    /* Fix email button overflow */
-    .cta-email {
-      font-size: clamp(12px, 3.5vw, 18px);
-      padding: 16px 20px;
-      word-break: break-all;
-      max-width: 100%;
-    }
     /* Smaller subtitle on mobile */
     .cta-sub {
       font-size: 15px;
     }
     /* Tighter padding on mobile */
-    .hero, .services, .mission, .process, .cta, .logo-showcase, footer {
+    .hero, .services, .mission, .process, .cta, footer {
       padding-left: 16px;
       padding-right: 16px;
     }
-    nav { padding: 16px; }
-    .status-strip { padding-left: 16px; padding-right: 16px; }
-    /* Footer email overflow */
-    .footer-col a {
-      word-break: break-all;
-    }
-    /* Stack logo vertically on mobile */
-    .logo-lockup {
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-    .logo-lockup svg {
-      width: clamp(80px, 20vw, 150px);
-      height: clamp(80px, 20vw, 150px);
-    }
-    .logo-name-large {
-      text-align: center;
-      font-size: clamp(40px, 11vw, 56px);
-    }
+    .hero-logo-lockup { left: 16px; top: 16px; }
   }
 
   /* === REDUCED MOTION === */
   @media (prefers-reduced-motion: reduce) {
-    .ticker-inner,
-    .marquee-inner { animation: none; }
-    .status-strip .status-dot { animation: none; }
     .step-arrow { transition: none; }
     .btn-primary .chevron-anim { transition: none; }
     .btn-primary:hover .chevron-anim { letter-spacing: 0; }
     .process-step:hover .step-arrow { letter-spacing: 0; }
+    #ascii-bg { opacity: 0.15; }
   }
   /* === ASCII BACKGROUND === */
   #ascii-bg {
@@ -1095,13 +656,6 @@
     z-index: 1;
   }
 
-  @media (max-width: 640px) {
-    #ascii-bg { display: none; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #ascii-bg { opacity: 0.15; }
-  }
 </style>
 <script type="importmap">
 {
@@ -1114,58 +668,6 @@
 </head>
 <body>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-inner">
-    <span>Automate the dread away</span>
-    <span>//</span>
-    <span>Business process automation</span>
-    <span>//</span>
-    <span>Workflow engineering</span>
-    <span>//</span>
-    <span>Systems integration</span>
-    <span>//</span>
-    <span>Automate the dread away</span>
-    <span>//</span>
-    <span>Business process automation</span>
-    <span>//</span>
-    <span>Workflow engineering</span>
-    <span>//</span>
-    <span>Systems integration</span>
-    <span>//</span>
-  </div>
-</div>
-
-<!-- LOGO SHOWCASE -->
-<section class="logo-showcase">
-  <!-- Crosshairs at corners -->
-  <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
-  <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
-  <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
-  <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
-
-  <div class="logo-lockup">
-    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1;">
-      <rect width="36" height="36" rx="2" fill="#E8652B"/>
-      <polygon points="11,5.15 12.3,9.21 16.56,9.19 13.11,11.69 14.45,15.73 11,13.21 7.56,15.73 8.89,11.69 5.44,9.19 9.7,9.21" fill="#0A0A0A"/>
-      <polygon points="25,5.15 26.3,9.21 30.56,9.19 27.11,11.69 28.45,15.73 25,13.21 21.56,15.73 22.89,11.69 19.44,9.19 23.7,9.21" fill="#0A0A0A"/>
-      <polygon points="18,18.15 19.3,22.21 23.56,22.19 20.11,24.69 21.45,28.73 18,26.21 14.56,28.73 15.89,24.69 12.44,22.19 16.7,22.21" fill="#0A0A0A"/>
-    </svg>
-    <div class="logo-name-large">
-      <span class="nashville">Nashville</span>
-      <span class="automation">Automation</span>
-      <span class="company">Company</span>
-    </div>
-  </div>
-
-</section>
-
-<!-- STATUS STRIP -->
-<div class="status-strip">
-  <div><span class="status-dot"></span>Systems: Nominal</div>
-  <div>36.1627&deg; N / 86.7816&deg; W</div>
-</div>
-
 <!-- HERO -->
 <section class="hero" id="home">
   <div id="ascii-bg" aria-hidden="true"></div>
@@ -1176,56 +678,28 @@
   <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
 
+  <div class="hero-logo-lockup">
+    <svg viewBox="0 0 36 36" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="2" fill="#E8652B"/>
+      <polygon points="11,5.15 12.3,9.21 16.56,9.19 13.11,11.69 14.45,15.73 11,13.21 7.56,15.73 8.89,11.69 5.44,9.19 9.7,9.21" fill="#0A0A0A"/>
+      <polygon points="25,5.15 26.3,9.21 30.56,9.19 27.11,11.69 28.45,15.73 25,13.21 21.56,15.73 22.89,11.69 19.44,9.19 23.7,9.21" fill="#0A0A0A"/>
+      <polygon points="18,18.15 19.3,22.21 23.56,22.19 20.11,24.69 21.45,28.73 18,26.21 14.56,28.73 15.89,24.69 12.44,22.19 16.7,22.21" fill="#0A0A0A"/>
+    </svg>
+    <span class="hero-logo-text">Nashville Automation Company</span>
+  </div>
+
   <div class="hero-grid">
     <div>
       <h1>Automate<br>the <em>dread</em><br>away.</h1>
-      <p class="hero-sub">We build systems that eliminate the monotony from your workday. Custom automation, workflow engineering, and intelligent integrations that let you focus on work that actually matters.</p>
+      <p class="hero-sub">We build systems that eliminate the monotony from your workday.</p>
       <div class="hero-actions">
-        <a href="mailto:automate@nashvilleautomation.io" class="btn-primary">Get In Touch <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
+        <a href="#book" data-cal-link="matthias-debernardini-ihio6p" data-cal-config='{"layout":"month_view"}' class="btn-primary">Book a Free Call <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
         <a href="#services" class="btn-secondary">View Services</a>
-      </div>
-      <div class="hero-readout" aria-hidden="true">
-        <span>Sector: B2B automation</span>
-        <span>Region: Southeast US</span>
-        <span>Mode: Active deployment</span>
-        <span>Version: 2026.1</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- MARQUEE -->
-<div class="marquee-banner">
-  <div class="marquee-inner">
-    <span class="marquee-item filled">Workflows</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Integrations</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item filled">AI Agents</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Data Pipelines</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item filled">Process Design</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Custom Software</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item filled">Workflows</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Integrations</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item filled">AI Agents</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Data Pipelines</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item filled">Process Design</span>
-    <span class="marquee-sep">+</span>
-    <span class="marquee-item">Custom Software</span>
-    <span class="marquee-sep">+</span>
-  </div>
-</div>
-
-<!-- BARCODE DIVIDER -->
-<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- SERVICES -->
 <section class="services" id="services">
@@ -1234,7 +708,7 @@
       <div class="section-label">What We Build</div>
       <h2 class="section-title">Services</h2>
     </div>
-    <span class="section-count">001 &mdash; 006</span>
+    <span class="section-count">001 &mdash; 004</span>
   </div>
 
   <div class="services-grid">
@@ -1252,16 +726,6 @@
       <span class="card-crosshair" aria-hidden="true">+</span>
       <div class="service-number">02</div>
       <div class="service-icon">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m-7-7h6m6 0h6m-16.97-5.97l4.24 4.24m5.46 5.46l4.24 4.24m0-13.94l-4.24 4.24m-5.46 5.46l-4.24 4.24"/></svg>
-      </div>
-      <h3>Systems Integration</h3>
-      <p>Connect your tools into a unified ecosystem. CRM, ERP, accounting, inventory -- we wire them together so data flows where it needs to go.</p>
-    </div>
-
-    <div class="service-card">
-      <span class="card-crosshair" aria-hidden="true">+</span>
-      <div class="service-number">03</div>
-      <div class="service-icon">
         <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
       </div>
       <h3>AI-Powered Agents</h3>
@@ -1270,32 +734,22 @@
 
     <div class="service-card">
       <span class="card-crosshair" aria-hidden="true">+</span>
-      <div class="service-number">04</div>
-      <div class="service-icon">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      </div>
-      <h3>Document Processing</h3>
-      <p>Automated extraction, classification, and routing of invoices, contracts, and forms. Turn paper chaos into structured data.</p>
-    </div>
-
-    <div class="service-card">
-      <span class="card-crosshair" aria-hidden="true">+</span>
-      <div class="service-number">05</div>
+      <div class="service-number">03</div>
       <div class="service-icon">
         <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
       <h3>Data Pipelines</h3>
-      <p>Real-time data flows between your systems. Automated reporting, dashboards, and alerts that keep you informed without lifting a finger.</p>
+      <p>Automated data flows that connect your systems and deliver real-time reporting, dashboards, and alerts -- so decisions are made on facts, not guesses.</p>
     </div>
 
     <div class="service-card">
       <span class="card-crosshair" aria-hidden="true">+</span>
-      <div class="service-number">06</div>
+      <div class="service-number">04</div>
       <div class="service-icon">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m-7-7h6m6 0h6m-16.97-5.97l4.24 4.24m5.46 5.46l4.24 4.24m0-13.94l-4.24 4.24m-5.46 5.46l-4.24 4.24"/></svg>
       </div>
-      <h3>Custom Software</h3>
-      <p>When off-the-shelf tools don't cut it, we build exactly what you need. Internal tools, portals, and applications tailored to your operations.</p>
+      <h3>Operational Intelligence</h3>
+      <p>Real-time visibility into your operations powered by connected systems and AI. See what's happening, predict what's next, and act before problems start.</p>
     </div>
   </div>
 </section>
@@ -1369,7 +823,7 @@
 <div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- CTA -->
-<section class="cta" id="contact">
+<section class="cta" id="book">
   <!-- Crosshairs -->
   <span class="crosshair" style="top:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="top:16px;right:16px;" aria-hidden="true">+</span>
@@ -1377,8 +831,9 @@
   <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
 
   <h2>Stop Dreading<br>Monday.</h2>
-  <p class="cta-sub">Let's talk about what we can automate for your business. Reach out and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
-  <a href="mailto:automate@nashvilleautomation.io" class="cta-email">automate@nashvilleautomation.io</a>
+  <p class="cta-sub">Book a free call and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
+  <a href="#book" data-cal-link="matthias-debernardini-ihio6p" data-cal-config='{"layout":"month_view"}' class="btn-primary btn-primary-lg">Book a Free Call <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
+  <p class="cta-email-secondary">or email <a href="mailto:automate@nashvilleautomation.io">automate@nashvilleautomation.io</a></p>
 </section>
 
 <!-- FOOTER -->
@@ -1393,8 +848,6 @@
 
 <script type="module">
 try {
-  if (window.innerWidth < 480) throw new Error('skip');
-
   const { Scene, PerspectiveCamera, WebGLRenderer, PointLight, AmbientLight,
           Mesh, MeshPhongMaterial, BoxGeometry, CylinderGeometry, Group
   } = await import('three');
@@ -1410,7 +863,8 @@ try {
 
   const renderer = new WebGLRenderer({ alpha: true });
 
-  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: 0.18, color: true });
+  const asciiResolution = window.innerWidth < 768 ? 0.3 : 0.18;
+  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: asciiResolution, color: true });
   effect.setSize(container.clientWidth, container.clientHeight);
   effect.domElement.style.color = '';
   effect.domElement.style.backgroundColor = 'transparent';
@@ -1795,19 +1249,22 @@ try {
   }
   requestAnimationFrame(animate);
 
+  let resizeTimer;
   window.addEventListener('resize', () => {
-    if (window.innerWidth < 480) { container.style.display = 'none'; return; }
-    container.style.display = '';
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    effect.setSize(w, h);
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      effect.setSize(w, h);
+    }, 200);
   });
 } catch (e) {
   // Graceful degradation — page works fine without the effect
 }
 </script>
 
+<script src="https://app.cal.com/embed/embed.js" async></script>
 </body>
 </html>
