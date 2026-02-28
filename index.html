@@ -1038,6 +1038,20 @@
     .footer-col a {
       word-break: break-all;
     }
+    /* Stack logo vertically on mobile */
+    .logo-lockup {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-lockup svg {
+      width: clamp(80px, 20vw, 150px);
+      height: clamp(80px, 20vw, 150px);
+    }
+    .logo-name-large {
+      text-align: center;
+      font-size: clamp(40px, 11vw, 56px);
+    }
   }
 
   /* === REDUCED MOTION === */
@@ -1133,9 +1147,9 @@
   <div class="logo-lockup">
     <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1;">
       <rect width="36" height="36" rx="2" fill="#E8652B"/>
-      <polygon points="18,5.15 19.3,9.21 23.56,9.19 20.11,11.69 21.45,15.73 18,13.21 14.56,15.73 15.89,11.69 12.44,9.19 16.7,9.21" fill="#0A0A0A"/>
-      <polygon points="11,18.15 12.3,22.21 16.56,22.19 13.11,24.69 14.45,28.73 11,26.21 7.56,28.73 8.89,24.69 5.44,22.19 9.7,22.21" fill="#0A0A0A"/>
-      <polygon points="25,18.15 26.3,22.21 30.56,22.19 27.11,24.69 28.45,28.73 25,26.21 21.56,28.73 22.89,24.69 19.44,22.19 23.7,22.21" fill="#0A0A0A"/>
+      <polygon points="11,5.15 12.3,9.21 16.56,9.19 13.11,11.69 14.45,15.73 11,13.21 7.56,15.73 8.89,11.69 5.44,9.19 9.7,9.21" fill="#0A0A0A"/>
+      <polygon points="25,5.15 26.3,9.21 30.56,9.19 27.11,11.69 28.45,15.73 25,13.21 21.56,15.73 22.89,11.69 19.44,9.19 23.7,9.21" fill="#0A0A0A"/>
+      <polygon points="18,18.15 19.3,22.21 23.56,22.19 20.11,24.69 21.45,28.73 18,26.21 14.56,28.73 15.89,24.69 12.44,22.19 16.7,22.21" fill="#0A0A0A"/>
     </svg>
     <div class="logo-name-large">
       <span class="nashville">Nashville</span>
