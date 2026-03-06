@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Builder — Nashville Automation Company</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a1a; color: #ccc; font-family: monospace; padding: 24px; }
+  h1 { font-size: 16px; margin-bottom: 16px; color: #E8652B; }
+  .controls { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  button { background: #E8652B; color: #0a0a0a; border: none; padding: 10px 20px; font-family: monospace; font-weight: bold; cursor: pointer; font-size: 13px; }
+  button:hover { background: #F47A42; }
+  .preview { background: #131110; padding: 24px; border: 1px solid #333; margin-bottom: 16px; overflow: auto; }
+  .label { font-size: 11px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .section { margin-bottom: 32px; }
+</style>
+</head>
+<body>
+<h1>[ PIXEL-BLOCK LOGO BUILDER ]</h1>
+
+<div class="controls">
+  <button onclick="downloadSVG('lockup')">Download Lockup SVG</button>
+  <button onclick="downloadSVG('icon')">Download Icon SVG</button>
+  <button onclick="downloadSVG('favicon')">Download Favicon SVG</button>
+  <button onclick="downloadSVG('og')">Download OG Image SVG</button>
+  <button onclick="downloadPNG('og', 1200, 630)">Download OG Image PNG</button>
+  <button onclick="downloadSVG('tagline')">Download Tagline SVG</button>
+  <button onclick="copySVG('lockup')">Copy Lockup SVG</button>
+  <button onclick="copySVG('hero')">Copy Hero SVG</button>
+  <button onclick="downloadAllZip()" style="background:#F47A42;">Download All (ZIP)</button>
+</div>
+
+<div class="section">
+  <div class="label">Full Lockup (Stars + Text)</div>
+  <div class="preview" id="preview-lockup"></div>
+</div>
+
+<div class="section">
+  <div class="label">Icon Only (Stars)</div>
+  <div class="preview" id="preview-icon"></div>
+</div>
+
+<div class="section">
+  <div class="label">Favicon (Simplified)</div>
+  <div class="preview" id="preview-favicon"></div>
+</div>
+
+<div class="section">
+  <div class="label">OG Image (1200x630)</div>
+  <div class="preview" id="preview-og"></div>
+</div>
+
+<div class="section">
+  <div class="label">Tagline (Automate the Dread Away)</div>
+  <div class="preview" id="preview-tagline"></div>
+</div>
+
+<div class="section">
+  <div class="label">Hero Inline (for index.html)</div>
+  <div class="preview" id="preview-hero"></div>
+</div>
+
+<script>
+// === CONFIG ===
+const TILE = 8;
+const GAP = 1;
+const UNIT = TILE + GAP; // 9px per grid cell
+const FILL = '#E8652B';
+const STROKE = '#9B4419';
+const BG = '#131110';
+
+// === 5x7 PIXEL FONT ===
+const FONT = {
+  A: [
+    '01110',
+    '10001',
+    '10001',
+    '11111',
+    '10001',
+    '10001',
+    '10001',
+  ],
+  B: [
+    '11110',
+    '10001',
+    '10001',
+    '11110',
+    '10001',
+    '10001',
+    '11110',
+  ],
+  C: [
+    '01110',
+    '10001',
+    '10000',
+    '10000',
+    '10000',
+    '10001',
+    '01110',
+  ],
+  D: [
+    '11100',
+    '10010',
+    '10001',
+    '10001',
+    '10001',
+    '10010',
+    '11100',
+  ],
+  E: [
+    '11111',
+    '10000',
+    '10000',
+    '11110',
+    '10000',
+    '10000',
+    '11111',
+  ],
+  F: [
+    '11111',
+    '10000',
+    '10000',
+    '11110',
+    '10000',
+    '10000',
+    '10000',
+  ],
+  G: [
+    '01110',
+    '10001',
+    '10000',
+    '10011',
+    '10001',
+    '10001',
+    '01110',
+  ],
+  H: [
+    '10001',
+    '10001',
+    '10001',
+    '11111',
+    '10001',
+    '10001',
+    '10001',
+  ],
+  I: [
+    '11111',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+    '11111',
+  ],
+  J: [
+    '00111',
+    '00010',
+    '00010',
+    '00010',
+    '00010',
+    '10010',
+    '01100',
+  ],
+  K: [
+    '10001',
+    '10010',
+    '10100',
+    '11000',
+    '10100',
+    '10010',
+    '10001',
+  ],
+  L: [
+    '10000',
+    '10000',
+    '10000',
+    '10000',
+    '10000',
+    '10000',
+    '11111',
+  ],
+  M: [
+    '10001',
+    '11011',
+    '10101',
+    '10101',
+    '10001',
+    '10001',
+    '10001',
+  ],
+  N: [
+    '10001',
+    '11001',
+    '10101',
+    '10011',
+    '10001',
+    '10001',
+    '10001',
+  ],
+  O: [
+    '01110',
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '01110',
+  ],
+  P: [
+    '11110',
+    '10001',
+    '10001',
+    '11110',
+    '10000',
+    '10000',
+    '10000',
+  ],
+  Q: [
+    '01110',
+    '10001',
+    '10001',
+    '10001',
+    '10101',
+    '10010',
+    '01101',
+  ],
+  R: [
+    '11110',
+    '10001',
+    '10001',
+    '11110',
+    '10100',
+    '10010',
+    '10001',
+  ],
+  S: [
+    '01111',
+    '10000',
+    '10000',
+    '01110',
+    '00001',
+    '00001',
+    '11110',
+  ],
+  T: [
+    '11111',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+  ],
+  U: [
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '01110',
+  ],
+  V: [
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '10001',
+    '01010',
+    '00100',
+  ],
+  W: [
+    '10001',
+    '10001',
+    '10001',
+    '10101',
+    '10101',
+    '11011',
+    '10001',
+  ],
+  X: [
+    '10001',
+    '10001',
+    '01010',
+    '00100',
+    '01010',
+    '10001',
+    '10001',
+  ],
+  Y: [
+    '10001',
+    '10001',
+    '01010',
+    '00100',
+    '00100',
+    '00100',
+    '00100',
+  ],
+  Z: [
+    '11111',
+    '00001',
+    '00010',
+    '00100',
+    '01000',
+    '10000',
+    '11111',
+  ],
+  ' ': [
+    '00000',
+    '00000',
+    '00000',
+    '00000',
+    '00000',
+    '00000',
+    '00000',
+  ],
+};
+
+// === PIXEL-BLOCK STAR (11x11 grid) ===
+// TN tristar 5-pointed star approximation using stair-step
+const STAR = [
+  '00000100000',
+  '00000100000',
+  '00001110000',
+  '00001110000',
+  '11111111111',
+  '01111111110',
+  '00111111100',
+  '00011011000',
+  '00110001100',
+  '01100000110',
+  '01000000010',
+];
+
+// === DETERMINISTIC TONAL VARIATION ===
+function tileColor(row, col) {
+  const hash = (row * 7 + col * 13) % 17;
+  const variation = (hash - 8) * 0.005; // ±4% lightness
+  // Parse base color and adjust
+  const r = 0xE8, g = 0x65, b = 0x2B;
+  const factor = 1 + variation;
+  const clamp = v => Math.max(0, Math.min(255, Math.round(v * factor)));
+  return `rgb(${clamp(r)},${clamp(g)},${clamp(b)})`;
+}
+
+// === RENDER A SINGLE TILE ===
+function renderTile(row, col, ox, oy, withSubdivision = true) {
+  const x = ox + col * UNIT;
+  const y = oy + row * UNIT;
+  const fill = tileColor(row, col);
+  let svg = '';
+
+  if (withSubdivision) {
+    // 2x2 sub-tiles with mortar
+    const sub = (TILE - 0.5) / 2; // ~3.75px each sub-tile
+    svg += `<rect x="${x}" y="${y}" width="${TILE}" height="${TILE}" fill="${fill}" stroke="${STROKE}" stroke-width="0.75"/>`;
+    // Internal mortar lines (cross pattern)
+    const mx = x + TILE / 2;
+    const my = y + TILE / 2;
+    svg += `<line x1="${mx}" y1="${y}" x2="${mx}" y2="${y + TILE}" stroke="${STROKE}" stroke-width="0.5"/>`;
+    svg += `<line x1="${x}" y1="${my}" x2="${x + TILE}" y2="${my}" stroke="${STROKE}" stroke-width="0.5"/>`;
+  } else {
+    // Simple tile (for favicon)
+    svg += `<rect x="${x}" y="${y}" width="${TILE}" height="${TILE}" fill="${fill}" stroke="${STROKE}" stroke-width="0.75"/>`;
+  }
+  return svg;
+}
+
+// === RENDER STAR FROM GRID ===
+function renderStar(ox, oy, withSubdivision = true) {
+  let svg = '';
+  for (let r = 0; r < STAR.length; r++) {
+    for (let c = 0; c < STAR[r].length; c++) {
+      if (STAR[r][c] === '1') {
+        svg += renderTile(r, c, ox, oy, withSubdivision);
+      }
+    }
+  }
+  return svg;
+}
+
+// === RENDER TEXT LINE ===
+function renderTextLine(text, ox, oy, withSubdivision = true) {
+  let svg = '';
+  let cursorX = 0;
+  for (const ch of text) {
+    const glyph = FONT[ch] || FONT[' '];
+    for (let r = 0; r < 7; r++) {
+      for (let c = 0; c < 5; c++) {
+        if (glyph[r][c] === '1') {
+          svg += renderTile(r, c + cursorX, ox, oy, withSubdivision);
+        }
+      }
+    }
+    cursorX += (ch === ' ') ? 3 : 6; // 1-tile gap between chars, 2 extra for space
+  }
+  return { svg, widthInCells: cursorX - 1 };
+}
+
+// === TRISTAR ARRANGEMENT ===
+// TN flag: two stars top, one star bottom center (inverted triangle)
+const STAR_COLS = 11;
+const STAR_ROWS = 11;
+
+function renderTristar(ox, oy, withSubdivision = true) {
+  let svg = '';
+  const starW = STAR_COLS * UNIT;
+  const starH = STAR_ROWS * UNIT;
+  const gapBetween = 2 * UNIT; // 2-tile gap between stars
+
+  // Top left star
+  svg += renderStar(ox, oy, withSubdivision);
+  // Top right star
+  svg += renderStar(ox + starW + gapBetween, oy, withSubdivision);
+  // Bottom center star
+  const bottomX = ox + (starW + gapBetween) / 2;
+  const bottomY = oy + starH + gapBetween;
+  svg += renderStar(bottomX, bottomY, withSubdivision);
+
+  const totalW = 2 * starW + gapBetween;
+  const totalH = 2 * starH + gapBetween;
+  return { svg, width: totalW, height: totalH };
+}
+
+// === BUILD FULL LOCKUP ===
+function buildLockup() {
+  const padding = 3 * UNIT;
+  const starsResult = renderTristar(padding, padding);
+
+  // Text lines: NASHVILLE, AUTOMATION, COMPANY
+  const textGap = 3 * UNIT; // gap between stars and text
+  const textX = padding + starsResult.width + textGap;
+  const lineGap = 2 * UNIT; // gap between text lines
+
+  const line1 = renderTextLine('NASHVILLE', textX, 0);
+  const line2 = renderTextLine('AUTOMATION', textX, 0);
+  const line3 = renderTextLine('COMPANY', textX, 0);
+
+  // Calculate text block height
+  const textBlockH = 3 * (7 * UNIT) + 2 * lineGap;
+  // Vertically center text against stars
+  const textStartY = padding + (starsResult.height - textBlockH) / 2;
+
+  let textSvg = '';
+  textSvg += renderTextLine('NASHVILLE', textX, textStartY).svg;
+  textSvg += renderTextLine('AUTOMATION', textX, textStartY + 7 * UNIT + lineGap).svg;
+  textSvg += renderTextLine('COMPANY', textX, textStartY + 2 * (7 * UNIT + lineGap)).svg;
+
+  // Calculate max text width
+  const maxTextW = Math.max(line1.widthInCells, line2.widthInCells, line3.widthInCells) * UNIT;
+  const totalW = textX + maxTextW + padding;
+  const totalH = starsResult.height + 2 * padding;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" shape-rendering="crispEdges">
+<rect width="${totalW}" height="${totalH}" fill="${BG}"/>
+${starsResult.svg}
+${textSvg}
+</svg>`;
+  return svg;
+}
+
+// === BUILD ICON (stars only, square) ===
+function buildIcon() {
+  const padding = 2 * UNIT;
+  const starsResult = renderTristar(padding, padding);
+  const size = Math.max(starsResult.width, starsResult.height) + 2 * padding;
+
+  // Center stars in square
+  const ox = (size - starsResult.width) / 2;
+  const oy = (size - starsResult.height) / 2;
+  const centered = renderTristar(ox, oy);
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" shape-rendering="crispEdges">
+<rect width="${size}" height="${size}" fill="${BG}"/>
+${centered.svg}
+</svg>`;
+  return svg;
+}
+
+// === BUILD FAVICON (simplified, no subdivision) ===
+function buildFavicon() {
+  const padding = 1 * UNIT;
+  const starsResult = renderTristar(padding, padding, false);
+  const size = Math.max(starsResult.width, starsResult.height) + 2 * padding;
+
+  const ox = (size - starsResult.width) / 2;
+  const oy = (size - starsResult.height) / 2;
+  const centered = renderTristar(ox, oy, false);
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="32" height="32" shape-rendering="crispEdges">
+<rect width="${size}" height="${size}" fill="${BG}"/>
+${centered.svg}
+</svg>`;
+  return svg;
+}
+
+// === BUILD OG IMAGE (1200x630) ===
+function buildOG() {
+  const W = 1200, H = 630;
+  // Build lockup at normal scale, then wrap in a scaled group
+  const padding = 3 * UNIT;
+  const starsResult = renderTristar(padding, padding);
+
+  const textGap = 3 * UNIT;
+  const textX = padding + starsResult.width + textGap;
+  const lineGap = 2 * UNIT;
+
+  const textBlockH = 3 * (7 * UNIT) + 2 * lineGap;
+  const textStartY = padding + (starsResult.height - textBlockH) / 2;
+
+  let textSvg = '';
+  textSvg += renderTextLine('NASHVILLE', textX, textStartY).svg;
+  textSvg += renderTextLine('AUTOMATION', textX, textStartY + 7 * UNIT + lineGap).svg;
+  textSvg += renderTextLine('COMPANY', textX, textStartY + 2 * (7 * UNIT + lineGap)).svg;
+
+  const line1 = renderTextLine('NASHVILLE', 0, 0);
+  const line2 = renderTextLine('AUTOMATION', 0, 0);
+  const line3 = renderTextLine('COMPANY', 0, 0);
+  const maxTextW = Math.max(line1.widthInCells, line2.widthInCells, line3.widthInCells) * UNIT;
+  const lockupW = textX + maxTextW + padding;
+  const lockupH = starsResult.height + 2 * padding;
+
+  // Scale to fit with room for tagline
+  const scale = Math.min((W - 80) / lockupW, (H - 200) / lockupH);
+  const roundedScale = Math.floor(scale * 10) / 10;
+
+  const offsetX = (W - lockupW * roundedScale) / 2;
+  const offsetY = 50;
+
+  // Tagline below lockup
+  const taglineY = offsetY + lockupH * roundedScale + 30;
+  const tagResult = renderTextLine('AUTOMATE THE DREAD AWAY', 0, 0);
+  const tagW = tagResult.widthInCells * UNIT;
+  const tagX = (W - tagW) / 2;
+  const tagSvg = `<g transform="translate(${tagX},${taglineY})">${tagResult.svg}</g>`;
+
+  // URL at bottom
+  const urlResult = renderTextLine('NASHVILLEAUTOMATION IO', 0, 0);
+  const urlW = urlResult.widthInCells * UNIT;
+  const urlScale = 0.6;
+  const urlX = (W - urlW * urlScale) / 2;
+  const urlY = H - 40;
+  const urlSvg = `<g transform="translate(${urlX},${urlY}) scale(${urlScale})" opacity="0.35">${urlResult.svg}</g>`;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" shape-rendering="crispEdges">
+<rect width="${W}" height="${H}" fill="${BG}"/>
+<g transform="translate(${offsetX},${offsetY}) scale(${roundedScale})">
+${starsResult.svg}
+${textSvg}
+</g>
+${tagSvg}
+${urlSvg}
+</svg>`;
+  return svg;
+}
+
+// === BUILD HERO (compact for nav bar) ===
+function buildHero() {
+  // Small tristar for hero nav — just the stars, compact
+  const padding = 0;
+  const starsResult = renderTristar(padding, padding);
+  const size = Math.max(starsResult.width, starsResult.height);
+  const ox = (size - starsResult.width) / 2;
+  const oy = (size - starsResult.height) / 2;
+  const centered = renderTristar(ox, oy);
+
+  const svg = `<svg viewBox="0 0 ${size} ${size}" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+${centered.svg}
+</svg>`;
+  return svg;
+}
+
+// === BUILD TAGLINE (standalone) ===
+function buildTagline() {
+  const padding = 2 * UNIT;
+  const line1 = renderTextLine('AUTOMATE THE', 0, 0);
+  const line2 = renderTextLine('DREAD AWAY', 0, 0);
+  const lineGap = 2 * UNIT;
+  const maxW = Math.max(line1.widthInCells, line2.widthInCells) * UNIT;
+  const totalW = maxW + 2 * padding;
+  const totalH = 2 * (7 * UNIT) + lineGap + 2 * padding;
+
+  // Center each line horizontally
+  const l1X = padding + (maxW - line1.widthInCells * UNIT) / 2;
+  const l2X = padding + (maxW - line2.widthInCells * UNIT) / 2;
+
+  let inner = '';
+  inner += renderTextLine('AUTOMATE THE', l1X, padding).svg;
+  inner += renderTextLine('DREAD AWAY', l2X, padding + 7 * UNIT + lineGap).svg;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}" shape-rendering="crispEdges">
+<rect width="${totalW}" height="${totalH}" fill="${BG}"/>
+${inner}
+</svg>`;
+}
+
+// === RENDER ALL PREVIEWS ===
+const svgCache = {};
+function renderAll() {
+  svgCache.lockup = buildLockup();
+  svgCache.icon = buildIcon();
+  svgCache.favicon = buildFavicon();
+  svgCache.og = buildOG();
+  svgCache.hero = buildHero();
+  svgCache.tagline = buildTagline();
+
+  document.getElementById('preview-lockup').innerHTML = svgCache.lockup;
+  document.getElementById('preview-icon').innerHTML = svgCache.icon;
+  document.getElementById('preview-favicon').innerHTML = svgCache.favicon;
+  document.getElementById('preview-og').innerHTML = svgCache.og;
+  document.getElementById('preview-hero').innerHTML = svgCache.hero;
+  document.getElementById('preview-tagline').innerHTML = svgCache.tagline;
+}
+
+// === EXPORT FUNCTIONS ===
+function downloadSVG(key) {
+  const blob = new Blob([svgCache[key]], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const names = { lockup: 'logo-lockup.svg', icon: 'logo-icon.svg', favicon: 'favicon.svg', og: 'og-image.svg', tagline: 'tagline.svg' };
+  a.download = names[key] || `${key}.svg`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadPNG(key, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  const blob = new Blob([svgCache[key]], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, w, h);
+    canvas.toBlob(pngBlob => {
+      const pngUrl = URL.createObjectURL(pngBlob);
+      const a = document.createElement('a');
+      a.href = pngUrl;
+      a.download = 'og-image.png';
+      a.click();
+      URL.revokeObjectURL(pngUrl);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+  img.src = url;
+}
+
+function copySVG(key) {
+  navigator.clipboard.writeText(svgCache[key]).then(() => alert('SVG copied to clipboard'));
+}
+
+// === SVG to raster (PNG or JPEG) via canvas ===
+function svgToBlob(svgStr, w, h, format = 'image/png') {
+  return new Promise(resolve => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    // For JPEG, fill background (transparent -> white looks bad)
+    if (format === 'image/jpeg') {
+      ctx.fillStyle = '#131110';
+      ctx.fillRect(0, 0, w, h);
+    }
+    const img = new Image();
+    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(resolve, format, format === 'image/jpeg' ? 0.95 : undefined);
+    };
+    img.src = url;
+  });
+}
+
+function blobToArrayBuffer(blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsArrayBuffer(blob);
+  });
+}
+
+// === DOWNLOAD ALL AS ZIP ===
+async function downloadAllZip() {
+  const btn = event.target;
+  btn.textContent = 'Building ZIP...';
+  btn.disabled = true;
+
+  // Load JSZip from CDN
+  if (!window.JSZip) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  const zip = new JSZip();
+  const svgFolder = zip.folder('svg');
+  const pngFolder = zip.folder('png');
+  const jpegFolder = zip.folder('jpeg');
+
+  // Define all assets with their render sizes
+  const assets = [
+    { key: 'lockup', name: 'logo-lockup', w: 828, h: 270 },
+    { key: 'icon',   name: 'logo-icon',   w: 252, h: 252 },
+    { key: 'favicon',name: 'favicon',     w: 256, h: 256 },
+    { key: 'og',     name: 'og-image',    w: 1200, h: 630 },
+    { key: 'hero',   name: 'hero-icon',   w: 216, h: 216 },
+    { key: 'tagline',name: 'tagline',     w: 700, h: 200 },
+  ];
+
+  for (const asset of assets) {
+    const svgStr = svgCache[asset.key];
+
+    // SVG
+    svgFolder.file(asset.name + '.svg', svgStr);
+
+    // PNG
+    const pngBlob = await svgToBlob(svgStr, asset.w, asset.h, 'image/png');
+    pngFolder.file(asset.name + '.png', await blobToArrayBuffer(pngBlob));
+
+    // JPEG
+    const jpegBlob = await svgToBlob(svgStr, asset.w, asset.h, 'image/jpeg');
+    jpegFolder.file(asset.name + '.jpg', await blobToArrayBuffer(jpegBlob));
+  }
+
+  // Generate and download
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(zipBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nashville-automation-logos.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  btn.textContent = 'Download All (ZIP)';
+  btn.disabled = false;
+}
+
+renderAll();
+</script>
+</body>
+</html>
