@@ -489,6 +489,109 @@
     flex-wrap: wrap;
   }
 
+  /* === FOUNDERS === */
+  .founders {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .founders-photo {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    margin-bottom: 48px;
+  }
+
+  .founders-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    object-position: center 38%;
+  }
+
+  .founders-caption {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .founders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .founder {
+    background: var(--bg);
+    padding: 40px 32px;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .founder:hover { background: var(--surface); }
+
+  .founder .card-crosshair {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--crosshair);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .founder-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .founder-name {
+    font-family: var(--condensed);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+
+  .founder-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .founder p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .founder p:last-child { margin-bottom: 0; }
+
   /* === CTA === */
   .cta {
     padding: 100px 48px;
@@ -591,7 +694,8 @@
     .process-step:nth-child(3) { border-top: 1px solid var(--border); }
     .process-step:nth-child(4) { border-top: 1px solid var(--border); }
     .mission-grid { grid-template-columns: 1fr; gap: 40px; }
-    .hero, .services, .mission, .process, .cta, footer { padding-left: 24px; padding-right: 24px; }
+    .founders-grid { grid-template-columns: 1fr; }
+    .hero, .services, .mission, .process, .founders, .cta, footer { padding-left: 24px; padding-right: 24px; }
     .hero-logo-lockup { left: 24px; }
   }
 
@@ -610,10 +714,12 @@
       font-size: 15px;
     }
     /* Tighter padding on mobile */
-    .hero, .services, .mission, .process, .cta, footer {
+    .hero, .services, .mission, .process, .founders, .cta, footer {
       padding-left: 16px;
       padding-right: 16px;
     }
+    .founders-photo img { aspect-ratio: 16 / 9; }
+    .founders-caption { flex-direction: column; gap: 4px; }
     .hero-logo-lockup { left: 16px; top: 16px; }
   }
 
@@ -811,6 +917,48 @@
         <span>Sectors: Healthcare, Hospitality, Logistics</span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- BARCODE DIVIDER -->
+<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
+
+<!-- FOUNDERS -->
+<section class="founders" id="founders">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Who Runs It</div>
+      <h2 class="section-title">Founders</h2>
+    </div>
+    <span class="section-count">001 &mdash; 002</span>
+  </div>
+
+  <figure class="founders-photo">
+    <img src="founders.jpg" width="1800" height="1079" loading="lazy" alt="Rob Castro and Matthias Debernardini of Nashville Automation Company">
+    <figcaption class="founders-caption">
+      <span>Rob Castro &amp; Matthias Debernardini</span>
+      <span>Nashville, Tennessee</span>
+    </figcaption>
+  </figure>
+
+  <div class="founders-grid">
+    <article class="founder">
+      <span class="card-crosshair" aria-hidden="true">+</span>
+      <div class="founder-num">01</div>
+      <h3 class="founder-name">Rob Castro</h3>
+      <div class="founder-role">COO &amp; Operating Partner</div>
+      <p>Rob Castro is the COO and operating partner of Nashville Automation Company, a firm founded at Bitcoin Park that designs and deploys custom AI systems and automations for small and midsize businesses. He runs client strategy, sales, and the relationships that hold every engagement together, from the first introduction call through the final sprint demo. Most days he's in conversation with founders and operators across accounting, construction, and consulting, running The Friction Audit, the firm's structured discovery process, and figuring out how Nashville Automation Company can cut the work that's eating their team. He believes the way to build a great firm is the same way you close a hard deal: listen first, ship fast, and let the work do the talking.</p>
+      <p>Before Nashville Automation Company, Rob spent more than a decade in technology staffing and recruiting, where he earned a reputation as the person founders call when they need to close hard deals, hire impossible roles, or bring sharp thinking to a stuck conversation. In 2018 he founded MonzTech, an IT staffing firm he still operates today. Rob lives outside Nashville in Franklin, Tennessee, where he's an active member of the Bitcoin Park community and a fan of every losing Baltimore sports team that will have him.</p>
+    </article>
+
+    <article class="founder">
+      <span class="card-crosshair" aria-hidden="true">+</span>
+      <div class="founder-num">02</div>
+      <h3 class="founder-name">Matthias Debernardini</h3>
+      <div class="founder-role">Founder, CEO &amp; CTO</div>
+      <p>Matthias Debernardini is the founder, CEO, and CTO of Nashville Automation Company, the firm he started to design and deploy custom AI systems and automations for small and midsize businesses. He owns the build: ideation, implementation, quality control, and devops, carrying every engagement from a rough idea on a discovery call to a tested system running in production. Where Rob works the front of the house, Matthias is the one in the code &mdash; architecting the automation, writing it, breaking it before a client ever can, and standing up the infrastructure that keeps it running. He sees the job in plain terms: take the idea a client can describe but can't build, and give it life as a system that runs on its own.</p>
+      <p>Before Nashville Automation Company, Matthias was the founding engineer at AnchorWatch, a Bitcoin custody and insurance startup, where he built the platform from the ground up. It taught him to ship software the hard way &mdash; systems that have to stay up, hold under load, and never drop what they're trusted with &mdash; and that's the standard he holds every system the firm ships. He lives in downtown Nashville, a few minutes from Bitcoin Park, where he founded Nashville Automation Company and where you'll still find him most weeks.</p>
+    </article>
   </div>
 </section>
 
