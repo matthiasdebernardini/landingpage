@@ -220,6 +220,7 @@
   /* === SWISS GRID: every section's content aligns to one centered column === */
   .hero-grid,
   .section-header,
+  .agstaff-inner,
   .services-grid,
   .process-steps,
   .mission-grid,
@@ -268,6 +269,173 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-dim);
+  }
+
+  /* === AGSTAFF — FLAGSHIP === */
+  .agstaff {
+    padding: var(--section-y) 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-deep);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* faint orange field, bottom-left, marks this as the flagship */
+  .agstaff::before {
+    content: '';
+    position: absolute;
+    left: -120px; bottom: -160px;
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, rgba(232,101,43,0.10) 0%, transparent 68%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .agstaff-inner { position: relative; z-index: 1; }
+
+  /* --- lead: badge + hook --- */
+  .agstaff-lead {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 56px;
+    align-items: center;
+    margin-bottom: 56px;
+  }
+
+  .agstaff-badge {
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    padding: 32px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+  }
+  .agstaff-badge .card-crosshair {
+    position: absolute; top: 10px; left: 10px;
+    font-family: var(--mono); font-size: 12px; color: var(--crosshair);
+    user-select: none; pointer-events: none;
+  }
+  .agstaff-badge img {
+    width: 104px; height: 104px; display: block;
+    filter: drop-shadow(0 6px 20px rgba(232,101,43,0.28));
+  }
+  .agstaff-wordmark {
+    font-family: var(--condensed);
+    font-size: 34px; font-weight: 900; letter-spacing: 0.04em;
+    color: var(--text-bright); line-height: 1;
+  }
+  .agstaff-badge .tag {
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+  }
+  .agstaff-badge .tag::before { content: '[ '; color: var(--text-dim); }
+  .agstaff-badge .tag::after  { content: ' ]'; color: var(--text-dim); }
+
+  .agstaff-label {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .agstaff-label::before { content: '[ '; color: var(--text-dim); }
+  .agstaff-label::after  { content: ' ]'; color: var(--text-dim); }
+
+  .agstaff-hook {
+    font-family: var(--condensed);
+    font-size: clamp(34px, 4.6vw, 60px);
+    font-weight: 900; line-height: 0.98; letter-spacing: 0.01em;
+    text-transform: uppercase; color: var(--text-bright);
+    margin-bottom: 20px;
+  }
+  .agstaff-hook em { font-style: normal; color: var(--accent); }
+
+  .agstaff-pitch {
+    font-size: 17px; line-height: 1.7; color: var(--text);
+    max-width: 620px; margin-bottom: 20px;
+  }
+
+  .agstaff-stack {
+    font-family: var(--mono); font-size: 11px; line-height: 1.7;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim);
+  }
+  .agstaff-stack b { color: var(--accent); font-weight: 700; }
+
+  /* --- roster of personas --- */
+  .agstaff-roster {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .persona {
+    background: var(--bg);
+    padding: 24px 24px 20px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .persona:hover { background: var(--surface); }
+  .persona-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 16px;
+  }
+  .persona-status { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); }
+  .persona-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    animation: agstaff-pulse 2.4s ease-in-out infinite;
+  }
+  .persona h4 {
+    font-family: var(--condensed); font-size: 24px; font-weight: 800;
+    letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--text-bright); margin-bottom: 8px;
+  }
+  .persona p { font-size: 13px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; }
+  .persona-tag {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-dim);
+    padding-top: 12px; border-top: 1px solid var(--border);
+  }
+
+  @keyframes agstaff-pulse { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+  /* --- teams + security strips --- */
+  .agstaff-meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .agstaff-meta > div { background: var(--bg); padding: 26px 28px; }
+  .agstaff-meta .lbl {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .agstaff-meta .lbl::before { content: '[ '; color: var(--text-dim); }
+  .agstaff-meta .lbl::after  { content: ' ]'; color: var(--text-dim); }
+  .agstaff-meta p { font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+  .agstaff-meta b { color: var(--text-bright); font-weight: 600; }
+
+  .agstaff-actions { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .agstaff-actions .note {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+
+  @media (max-width: 900px) {
+    .agstaff-lead { grid-template-columns: 1fr; gap: 32px; }
+    .agstaff-badge { flex-direction: row; justify-content: flex-start; padding: 24px; }
+    .agstaff-badge img { width: 72px; height: 72px; }
+    .agstaff-roster { grid-template-columns: repeat(2, 1fr); }
+    .agstaff-meta { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .agstaff-roster { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .persona-dot { animation: none; }
   }
 
   /* === SERVICES === */
@@ -765,6 +933,85 @@
         <a href="#services" class="btn-secondary">View Services</a>
       </div>
     </div>
+  </div>
+</section>
+
+
+<!-- AGSTAFF — FLAGSHIP OFFERING -->
+<section class="agstaff" id="agstaff">
+  <div class="agstaff-inner">
+
+    <div class="agstaff-lead">
+      <div class="agstaff-badge">
+        <span class="card-crosshair" aria-hidden="true">+</span>
+        <img src="agstaff-icon.png" width="104" height="104" alt="agstaff logo">
+        <span class="agstaff-wordmark">agstaff</span>
+        <span class="tag">Top Offering</span>
+      </div>
+
+      <div>
+        <div class="agstaff-label">Flagship &mdash; agstaff</div>
+        <h2 class="agstaff-hook">Everyone gets a<br><em>chief of staff.</em></h2>
+        <p class="agstaff-pitch">For decades a chief of staff was a perk of the corner office. <strong style="color:var(--text-bright);font-weight:600;">agstaff</strong> gives every person on your team one &mdash; a staff of AI specialists that quietly handle the work nobody should be doing by hand.</p>
+        <p class="agstaff-stack">Each specialist is a <b>persona</b> &mdash; a subagent, its skills, and live tool access via <b>CLI / API / MCP</b>, in any combination.</p>
+      </div>
+    </div>
+
+    <div class="agstaff-roster">
+      <div class="persona">
+        <div class="persona-head"><span>S-01</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Assigned</span></div>
+        <h4>Secretary</h4>
+        <p>Processes documents and invoices, triages the inbox, and keeps your email and calendar in order.</p>
+        <div class="persona-tag">Email &middot; Calendar &middot; Invoices</div>
+      </div>
+      <div class="persona">
+        <div class="persona-head"><span>S-02</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Assigned</span></div>
+        <h4>Accountant</h4>
+        <p>Keeps the books, reconciles transactions, and turns raw numbers into reports you can act on.</p>
+        <div class="persona-tag">Ledger &middot; Reconcile &middot; Reports</div>
+      </div>
+      <div class="persona">
+        <div class="persona-head"><span>S-03</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Assigned</span></div>
+        <h4>Scribe</h4>
+        <p>Captures notes, drafts documents, and writes the things you keep meaning to write.</p>
+        <div class="persona-tag">Notes &middot; Drafts &middot; Docs</div>
+      </div>
+      <div class="persona">
+        <div class="persona-head"><span>S-04</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Assigned</span></div>
+        <h4>Paralegal / Counsel</h4>
+        <p>Reviews contracts, flags the risky clauses, and prepares first-pass filings for your review.</p>
+        <div class="persona-tag">Contracts &middot; Review &middot; Filings</div>
+      </div>
+      <div class="persona">
+        <div class="persona-head"><span>S-05</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Assigned</span></div>
+        <h4>Dietician</h4>
+        <p>A personal perk &mdash; plans meals, tracks macros, and keeps your team fuelled, not just busy.</p>
+        <div class="persona-tag">Meals &middot; Macros &middot; Plans</div>
+      </div>
+      <div class="persona">
+        <div class="persona-head"><span>S-06</span><span class="persona-status"><span class="persona-dot" aria-hidden="true"></span>Custom</span></div>
+        <h4>Any Role</h4>
+        <p>Describe the job and we build the persona &mdash; a subagent, the right skills, wired to your tools.</p>
+        <div class="persona-tag">Subagent + Skill + MCP</div>
+      </div>
+    </div>
+
+    <div class="agstaff-meta">
+      <div>
+        <div class="lbl">Teams Plan</div>
+        <p>Every person gets their staff &mdash; and the team gets a <b>Company Brain</b> that remembers how you work, plus a <b>Meeting Transcriber</b> that captures every call and makes it searchable.</p>
+      </div>
+      <div>
+        <div class="lbl">Confidential by Construction</div>
+        <p>agstaff runs over <b>Tailscale</b>. Your data stays inside your own private network &mdash; nothing leaves your tailnet, so your team can trust it with the real work.</p>
+      </div>
+    </div>
+
+    <div class="agstaff-actions">
+      <a href="https://agstaff.pages.dev" target="_blank" rel="noopener" class="btn-primary btn-primary-lg">Explore agstaff <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
+      <span class="note">Our #1 offering</span>
+    </div>
+
   </div>
 </section>
 
