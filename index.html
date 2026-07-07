@@ -37,8 +37,12 @@
     --text: #C8B89A;
     --text-bright: #E8DCC8;
     --text-dim: #6B6050;
-    --grid-line: rgba(200,184,154,0.06);
+    --grid-line: rgba(200,184,154,0.05);
     --crosshair: rgba(200,184,154,0.12);
+    /* Swiss grid: one shared column + rhythm */
+    --container: 1200px;
+    --module: 80px;
+    --section-y: 96px;
     --mono: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
     --sans: 'Space Grotesk', -apple-system, sans-serif;
     --condensed: 'Barlow Condensed', 'Arial Narrow', sans-serif;
@@ -55,34 +59,18 @@
     position: relative;
   }
 
-  /* === GRID TEXTURE BACKGROUND === */
+  /* === BLUEPRINT GRID BACKGROUND — one module, centered, calm === */
   body::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background:
-      repeating-linear-gradient(90deg, var(--grid-line) 0px, var(--grid-line) 1px, transparent 1px, transparent 80px),
-      repeating-linear-gradient(0deg, var(--grid-line) 0px, var(--grid-line) 1px, transparent 1px, transparent 80px),
-      repeating-linear-gradient(90deg, rgba(200,184,154,0.025) 0px, rgba(200,184,154,0.025) 1px, transparent 1px, transparent 20px),
-      repeating-linear-gradient(0deg, rgba(200,184,154,0.025) 0px, rgba(200,184,154,0.025) 1px, transparent 1px, transparent 20px);
+    background-image:
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid-line) 1px, transparent 1px);
+    background-size: var(--module) var(--module);
+    background-position: center;
     pointer-events: none;
     z-index: 1;
-  }
-
-  /* === SCANLINE OVERLAY === */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      rgba(0,0,0,0.04) 1px,
-      rgba(0,0,0,0.04) 2px
-    );
-    pointer-events: none;
-    z-index: 9999;
   }
 
   /* === ALL CONTENT ABOVE GRID === */
@@ -105,27 +93,6 @@
   /* === BRACKET NOTATION FOR SECTION LABELS === */
   .section-label::before { content: '[ '; }
   .section-label::after { content: ' ]'; }
-
-  /* === BARCODE DIVIDER === */
-  .barcode-divider {
-    width: 100%;
-    height: 12px;
-    background:
-      repeating-linear-gradient(90deg,
-        var(--border-strong) 0px, var(--border-strong) 2px,
-        transparent 2px, transparent 5px,
-        var(--border-strong) 5px, var(--border-strong) 6px,
-        transparent 6px, transparent 8px,
-        var(--border-strong) 8px, var(--border-strong) 12px,
-        transparent 12px, transparent 14px,
-        var(--border-strong) 14px, var(--border-strong) 15px,
-        transparent 15px, transparent 20px
-      );
-    opacity: 0.5;
-  }
-
-
-
 
   /* === HERO === */
   .hero {
@@ -160,8 +127,9 @@
   }
 
   .hero-grid {
-    max-width: 720px;
+    width: 100%;
   }
+  .hero-grid > div { max-width: 660px; }
 
 
   .hero h1 {
@@ -249,6 +217,21 @@
   }
 
 
+  /* === SWISS GRID: every section's content aligns to one centered column === */
+  .hero-grid,
+  .section-header,
+  .services-grid,
+  .process-steps,
+  .mission-grid,
+  .founders-photo,
+  .founders-grid,
+  .cta-inner,
+  .footer-bottom {
+    max-width: var(--container);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   /* === SECTIONS SHARED === */
   .section-header {
     display: flex;
@@ -289,7 +272,7 @@
 
   /* === SERVICES === */
   .services {
-    padding: 80px 48px;
+    padding: var(--section-y) 48px;
     border-bottom: 1px solid var(--border);
     position: relative;
   }
@@ -370,7 +353,7 @@
 
   /* === PROCESS === */
   .process {
-    padding: 80px 48px;
+    padding: var(--section-y) 48px;
     border-bottom: 1px solid var(--border);
     position: relative;
   }
@@ -438,7 +421,7 @@
 
   /* === MISSION === */
   .mission {
-    padding: 80px 48px;
+    padding: var(--section-y) 48px;
     border-bottom: 1px solid var(--border);
     position: relative;
   }
@@ -491,7 +474,7 @@
 
   /* === FOUNDERS === */
   .founders {
-    padding: 80px 48px;
+    padding: var(--section-y) 48px;
     border-bottom: 1px solid var(--border);
     position: relative;
   }
@@ -596,27 +579,11 @@
 
   /* === CTA === */
   .cta {
-    padding: 100px 48px;
-    text-align: center;
+    padding: var(--section-y) 48px;
     position: relative;
     border-bottom: 1px solid var(--border);
     overflow: hidden;
   }
-
-  .cta::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .cta > * { position: relative; z-index: 1; }
 
   .cta h2 {
     font-family: var(--condensed);
@@ -633,9 +600,7 @@
     font-size: 17px;
     color: var(--text-dim);
     margin-bottom: 40px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 520px;
     line-height: 1.6;
   }
 
@@ -857,8 +822,6 @@
   </div>
 </section>
 
-<!-- BARCODE DIVIDER -->
-<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- PROCESS -->
 <section class="process" id="process">
@@ -897,8 +860,6 @@
   </div>
 </section>
 
-<!-- BARCODE DIVIDER -->
-<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- MISSION -->
 <section class="mission" id="about">
@@ -922,8 +883,6 @@
   </div>
 </section>
 
-<!-- BARCODE DIVIDER -->
-<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- FOUNDERS -->
 <section class="founders" id="founders">
@@ -965,8 +924,6 @@
   </div>
 </section>
 
-<!-- BARCODE DIVIDER -->
-<div class="barcode-divider" aria-hidden="true" style="position:relative;z-index:2;"></div>
 
 <!-- CTA -->
 <section class="cta" id="book">
@@ -976,16 +933,16 @@
   <span class="crosshair" style="bottom:16px;left:16px;" aria-hidden="true">+</span>
   <span class="crosshair" style="bottom:16px;right:16px;" aria-hidden="true">+</span>
 
-  <h2>Stop Dreading<br>Monday.</h2>
-  <p class="cta-sub">Book a free call and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
-  <a href="https://calendar.app.google/mb2vRFo1n52YruWW7" target="_blank" rel="noopener" class="btn-primary btn-primary-lg">Book a Free Call <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
-  <p class="cta-email-secondary">or email <a href="mailto:automate@nashvilleautomation.io">automate@nashvilleautomation.io</a></p>
+  <div class="cta-inner">
+    <h2>Stop Dreading<br>Monday.</h2>
+    <p class="cta-sub">Book a free call and we'll map your workflows, identify quick wins, and show you exactly what's possible.</p>
+    <a href="https://calendar.app.google/mb2vRFo1n52YruWW7" target="_blank" rel="noopener" class="btn-primary btn-primary-lg">Book a Free Call <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
+    <p class="cta-email-secondary">or email <a href="mailto:automate@nashvilleautomation.io">automate@nashvilleautomation.io</a></p>
+  </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <!-- Barcode divider above copyright -->
-  <div class="barcode-divider" aria-hidden="true" style="margin-bottom:24px;"></div>
 
   <div class="footer-bottom" style="position:relative;z-index:1;display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
     <span>&copy; 2026 Nashville Automation Company. All rights reserved.</span>
