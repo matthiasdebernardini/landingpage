@@ -987,8 +987,10 @@
   <!-- Barcode divider above copyright -->
   <div class="barcode-divider" aria-hidden="true" style="margin-bottom:24px;"></div>
 
-  <div class="footer-bottom" style="position:relative;z-index:1;">
+  <div class="footer-bottom" style="position:relative;z-index:1;display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
     <span>&copy; 2026 Nashville Automation Company. All rights reserved.</span>
+    <a href="/privacy.html" style="color:var(--text-dim);text-decoration:none;">Privacy Policy</a>
+    <a href="/terms.html" style="color:var(--text-dim);text-decoration:none;">Terms of Service</a>
   </div>
 </footer>
 
@@ -1004,165 +1006,229 @@ try {
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 2000);
-  camera.position.set(200, 400, 550);
-  camera.lookAt(0, 0, 0);
+  camera.position.set(210, 470, 720);
+  camera.lookAt(0, 8, 18);
 
   const renderer = new WebGLRenderer({ alpha: true });
 
-  const asciiResolution = window.innerWidth < 768 ? 0.3 : 0.18;
-  const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true, resolution: asciiResolution, color: true });
+  // Higher resolution = finer character grid = more detail (AsciiEffect: fraction of pixels -> chars).
+  const asciiResolution = window.innerWidth < 768 ? 0.32 : 0.27;
+  const effect = new AsciiEffect(renderer, ' .:-=+*oO%#@', { invert: true, resolution: asciiResolution, color: true });
   effect.setSize(container.clientWidth, container.clientHeight);
   effect.domElement.style.color = '';
   effect.domElement.style.backgroundColor = 'transparent';
   container.appendChild(effect.domElement);
 
+  // --- Materials ---
   const orangeMat = new MeshPhongMaterial({ color: 0xF47A42, flatShading: true, emissive: 0x3A1A08 });
-  const dimMat = new MeshPhongMaterial({ color: 0xB09A80, flatShading: true });
+  const dimMat    = new MeshPhongMaterial({ color: 0xB09A80, flatShading: true });
+  const paperMat  = new MeshPhongMaterial({ color: 0xEFE4D2, flatShading: true, emissive: 0x2A2620 }); // bright sheet -> dense ASCII
+  const inkMat    = new MeshPhongMaterial({ color: 0x5A4A3A, flatShading: true });                    // dim printed text lines
+  const signMat   = new MeshPhongMaterial({ color: 0xF47A42, flatShading: true, emissive: 0x4A1E08 }); // pen/stamp marks (orange)
+  const scanMat   = new MeshPhongMaterial({ color: 0xFFAE6B, flatShading: true, emissive: 0xF47A42 }); // glowing scan light
 
-  // --- Conveyor belt ---
-  const beltGroup = new Group();
+  const DOC_W = 48, DOC_T = 4, DOC_L = 64;
 
-  // Belt surface
-  const beltSurface = new Mesh(new BoxGeometry(1400, 8, 80), dimMat);
-  beltSurface.position.y = -4;
-  beltGroup.add(beltSurface);
-
-  // Two side rails
-  const railL = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
-  railL.position.set(0, 0, 43);
-  beltGroup.add(railL);
-  const railR = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
-  railR.position.set(0, 0, -43);
-  beltGroup.add(railR);
-
-  // 8 roller marks
-  const rollers = [];
-  for (let i = 0; i < 8; i++) {
-    const roller = new Mesh(new BoxGeometry(4, 9, 76), dimMat);
-    roller.position.set(-560 + i * 160, -4, 0);
-    beltGroup.add(roller);
-    rollers.push(roller);
+  // A document: bright sheet + orange header + printed lines, with hideable signature/stamp marks.
+  function makeDoc() {
+    const g = new Group();
+    g.add(new Mesh(new BoxGeometry(DOC_W, DOC_T, DOC_L), paperMat));
+    // orange header band — a whole-width block that reads at any ASCII resolution
+    const header = new Mesh(new BoxGeometry(DOC_W - 4, DOC_T + 1.4, 11), orangeMat);
+    header.position.set(0, 0.5, -DOC_L / 2 + 9);
+    g.add(header);
+    // three bold printed lines (dim texture)
+    for (let i = 0; i < 3; i++) {
+      const ln = new Mesh(new BoxGeometry(DOC_W - 14, 1.6, 3.4), inkMat);
+      ln.position.set(-2, DOC_T / 2 + 0.5, -6 + i * 9);
+      g.add(ln);
+    }
+    // signature — three thick angled strokes, revealed in sequence (chunky enough to read)
+    const sigMarks = [];
+    const sigSpec = [[-9, 22, 22, 0.5], [3, 24, 24, -0.7], [12, 20, 16, 0.3]];
+    for (const [x, z, len, rot] of sigSpec) {
+      const m = new Mesh(new BoxGeometry(len, 2.6, 3.6), signMat);
+      m.position.set(x, DOC_T / 2 + 0.9, z);
+      m.rotation.y = rot;
+      m.visible = false;
+      g.add(m); sigMarks.push(m);
+    }
+    // cost-code stamp — one chunky solid block
+    const stamp = new Mesh(new BoxGeometry(18, 2.6, 13), signMat);
+    stamp.position.set(11, DOC_T / 2 + 0.7, -DOC_L / 2 + 22);
+    stamp.visible = false;
+    g.add(stamp);
+    return { group: g, sigMarks, stamp };
+  }
+  function setDocProcessed(d, on) {
+    for (const m of d.sigMarks) m.visible = on;
+    d.stamp.visible = on;
   }
 
+  // --- Intake conveyor belt (documents ride in along X) ---
+  const beltGroup = new Group();
+  const beltSurface = new Mesh(new BoxGeometry(1400, 8, 96), dimMat);
+  beltSurface.position.y = -4;
+  beltGroup.add(beltSurface);
+  const railL = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
+  railL.position.set(0, 0, 51); beltGroup.add(railL);
+  const railR = new Mesh(new BoxGeometry(1400, 12, 6), dimMat);
+  railR.position.set(0, 0, -51); beltGroup.add(railR);
+  const rollers = [];
+  for (let i = 0; i < 10; i++) {
+    const roller = new Mesh(new BoxGeometry(4, 9, 92), dimMat);
+    roller.position.set(-630 + i * 140, -4, 0);
+    beltGroup.add(roller); rollers.push(roller);
+  }
   scene.add(beltGroup);
 
-  // --- Exit conveyor belts (perpendicular, one behind each arm) ---
+  // --- Outbound belts (perpendicular, one behind each cell) ---
   const armXPositions = [-300, 0, 300];
+  const platenZ = 90;
   const exitRollers = [];
   for (let i = 0; i < 3; i++) {
     const ax = armXPositions[i];
-
-    // Belt surface
-    const exitBelt = new Mesh(new BoxGeometry(80, 8, 400), dimMat);
-    exitBelt.position.set(ax, -4, -350);
-    scene.add(exitBelt);
-
-    // Side rails
-    const exitRailL = new Mesh(new BoxGeometry(6, 12, 400), dimMat);
-    exitRailL.position.set(ax - 43, 0, -350);
-    scene.add(exitRailL);
-
-    const exitRailR = new Mesh(new BoxGeometry(6, 12, 400), dimMat);
-    exitRailR.position.set(ax + 43, 0, -350);
-    scene.add(exitRailR);
-
-    // Roller marks (4 per belt)
+    const exitBelt = new Mesh(new BoxGeometry(96, 8, 420), dimMat);
+    exitBelt.position.set(ax, -4, -360); scene.add(exitBelt);
+    const exitRailL = new Mesh(new BoxGeometry(6, 12, 420), dimMat);
+    exitRailL.position.set(ax - 51, 0, -360); scene.add(exitRailL);
+    const exitRailR = new Mesh(new BoxGeometry(6, 12, 420), dimMat);
+    exitRailR.position.set(ax + 51, 0, -360); scene.add(exitRailR);
     const eRollers = [];
     for (let j = 0; j < 4; j++) {
-      const roller = new Mesh(new BoxGeometry(76, 9, 4), dimMat);
+      const roller = new Mesh(new BoxGeometry(92, 9, 4), dimMat);
       roller.position.set(ax, -4, -200 - j * 100);
-      scene.add(roller);
-      eRollers.push(roller);
+      scene.add(roller); eRollers.push(roller);
     }
     exitRollers.push(eRollers);
   }
 
-  // --- Conveyor items (6 orange boxes) ---
+  // --- Documents riding the intake belt ---
   const items = [];
   for (let i = 0; i < 6; i++) {
-    const box = new Mesh(new BoxGeometry(40, 40, 40), orangeMat);
-    box.position.set(-700 + i * (1400 / 6), 20, 0);
-    box.userData = { claimed: false };
-    scene.add(box);
-    items.push(box);
+    const d = makeDoc();
+    d.group.position.set(-700 + i * (1400 / 6), 6, 0);
+    d.group.userData = { claimed: false, doc: d };
+    scene.add(d.group);
+    items.push(d.group);
   }
 
-  // --- Exit boxes (one per arm, for sliding animation) ---
-  const exitBoxes = [];
+  // --- Finished documents that slide out on the outbound belts ---
+  const exitDocs = [];
   for (let i = 0; i < 3; i++) {
-    const box = new Mesh(new BoxGeometry(40, 40, 40), orangeMat);
-    box.position.set(armXPositions[i], 20, -160);
-    box.visible = false;
-    box.userData = { sliding: false };
-    scene.add(box);
-    exitBoxes.push(box);
+    const d = makeDoc();
+    setDocProcessed(d, true);
+    d.group.position.set(armXPositions[i], 6, -150);
+    d.group.visible = false;
+    d.group.userData = { sliding: false };
+    scene.add(d.group);
+    exitDocs.push(d);
   }
 
-  // --- Robot arms (3) — each positioned beside the belt ---
-  // Arms at z=-100, IK drives X-rotation to reach forward to belt at z=0
+  // --- Work cells: platen + tool bridge (scanner + pen/stamp) + the doc being worked ---
+  const cells = [];
+  for (let i = 0; i < 3; i++) {
+    const ax = armXPositions[i];
+    const platen = new Mesh(new BoxGeometry(72, 8, 72), dimMat);
+    platen.position.set(ax, 0, platenZ); scene.add(platen);
+
+    const postL = new Mesh(new BoxGeometry(7, 88, 7), dimMat);
+    postL.position.set(ax - 34, 44, platenZ); scene.add(postL);
+    const postR = new Mesh(new BoxGeometry(7, 88, 7), dimMat);
+    postR.position.set(ax + 34, 44, platenZ); scene.add(postR);
+    const beam = new Mesh(new BoxGeometry(82, 9, 11), dimMat);
+    beam.position.set(ax, 86, platenZ); scene.add(beam);
+
+    // Scanner head: a bar with a glowing light underneath, sweeps along the doc
+    const scanner = new Group(); scanner.position.set(ax, 0, platenZ); scene.add(scanner);
+    scanner.add((() => { const b = new Mesh(new BoxGeometry(64, 6, 8), orangeMat); b.position.y = 30; return b; })());
+    const scanLight = new Mesh(new BoxGeometry(56, 1.6, 8), scanMat);
+    scanLight.position.y = 14; scanner.add(scanLight);
+    scanner.visible = false;
+
+    // Pen head: tilted pen with an orange nib; moves to trace + stamp
+    const pen = new Group(); pen.position.set(ax, 40, platenZ); scene.add(pen);
+    const penBody = new Mesh(new CylinderGeometry(2.4, 1.1, 26, 6), dimMat);
+    penBody.position.set(2, 14, 0); penBody.rotation.z = -0.28; pen.add(penBody);
+    const penTip = new Mesh(new CylinderGeometry(1.2, 0.2, 6, 6), signMat);
+    penTip.position.set(0, 1, 0); pen.add(penTip);
+    pen.visible = false;
+
+    const wd = makeDoc();
+    wd.group.position.set(ax, 6, platenZ);
+    wd.group.visible = false; scene.add(wd.group);
+
+    cells.push({ ax, scanner, scanLight, pen, workDoc: wd, state: 'empty', workTime: 0 });
+  }
+
+  // --- Robot arms (3) — one behind each cell, IK reaches belt / platen / exit ---
+  const ARM_Z = -60;
   const arms = [];
 
   for (let i = 0; i < 3; i++) {
     const armGroup = new Group();
-    armGroup.position.set(armXPositions[i], 0, -100);
+    armGroup.position.set(armXPositions[i], 0, ARM_Z);
 
-    // Base cylinder (wider, more visible)
-    const base = new Mesh(new CylinderGeometry(35, 40, 60, 8), dimMat);
-    base.position.y = 30;
+    const base = new Mesh(new CylinderGeometry(34, 40, 54, 10), dimMat);
+    base.position.y = 27;
     armGroup.add(base);
 
-    // Turret group (Y rotation — swivel front/back)
+    // Turret group (Y rotation — swivel toward belt / platen / exit)
     const turretGroup = new Group();
-    turretGroup.position.y = 60;
+    turretGroup.position.y = 56;
     armGroup.add(turretGroup);
+    turretGroup.add(new Mesh(new CylinderGeometry(26, 28, 20, 10), dimMat));
 
-    const turretCap = new Mesh(new CylinderGeometry(28, 28, 20, 8), dimMat);
-    turretGroup.add(turretCap);
-
-    // Shoulder group (X rotation — swing forward/backward toward belt)
+    // Shoulder group (X rotation)
     const shoulderGroup = new Group();
     shoulderGroup.position.y = 10;
     turretGroup.add(shoulderGroup);
 
-    const upperArm = new Mesh(new BoxGeometry(24, 110, 24), dimMat);
+    const upperArm = new Mesh(new BoxGeometry(22, 110, 22), dimMat);
     upperArm.position.y = 55;
     shoulderGroup.add(upperArm);
+    // hydraulic piston detail (orange accent on the machinery)
+    const piston = new Mesh(new CylinderGeometry(4, 4, 78, 6), orangeMat);
+    piston.position.set(15, 46, 0); piston.rotation.z = 0.06;
+    shoulderGroup.add(piston);
 
     // Elbow group (X rotation — bend forearm down)
     const elbowGroup = new Group();
     elbowGroup.position.y = 110;
     shoulderGroup.add(elbowGroup);
 
-    const forearm = new Mesh(new BoxGeometry(20, 90, 20), dimMat);
+    const forearm = new Mesh(new BoxGeometry(18, 90, 18), dimMat);
     forearm.position.y = 45;
     elbowGroup.add(forearm);
 
-    // Gripper group at end of forearm
+    // Gripper at end of forearm — a wrist plate + two flat pads that grip a sheet
     const gripperGroup = new Group();
     gripperGroup.position.y = 90;
     elbowGroup.add(gripperGroup);
 
-    const fingerL = new Mesh(new BoxGeometry(8, 35, 8), orangeMat);
-    fingerL.position.set(-12, 17, 0);
-    gripperGroup.add(fingerL);
+    const wrist = new Mesh(new CylinderGeometry(13, 13, 8, 10), dimMat);
+    wrist.rotation.x = Math.PI / 2;
+    gripperGroup.add(wrist);
 
-    const fingerR = new Mesh(new BoxGeometry(8, 35, 8), orangeMat);
-    fingerR.position.set(12, 17, 0);
-    gripperGroup.add(fingerR);
+    const padL = new Mesh(new BoxGeometry(6, 11, 46), orangeMat);
+    padL.position.set(-24, 12, 0);
+    gripperGroup.add(padL);
+    const padR = new Mesh(new BoxGeometry(6, 11, 46), orangeMat);
+    padR.position.set(24, 12, 0);
+    gripperGroup.add(padR);
 
-    // Held box (big and bright, visible in ASCII)
-    const heldBox = new Mesh(new BoxGeometry(42, 42, 42), orangeMat);
-    heldBox.position.y = 35;
-    heldBox.visible = false;
-    gripperGroup.add(heldBox);
+    // The document currently held in the gripper (flat, below the pads)
+    const held = makeDoc();
+    held.group.position.set(0, 14, 0);
+    held.group.visible = false;
+    gripperGroup.add(held.group);
 
     scene.add(armGroup);
     arms.push({
-      turretGroup, shoulderGroup, elbowGroup, fingerL, fingerR, heldBox, armGroup,
-      armX: armXPositions[i],
-      exitBox: exitBoxes[i],
+      turretGroup, shoulderGroup, elbowGroup, padL, padR, held, armGroup,
+      armX: armXPositions[i], cell: cells[i], exitDoc: exitDocs[i],
       state: 'idle', stateTime: 0,
-      idleCooldown: i * 2600 + 200,
+      idleCooldown: i * 2200 + 400,
       targetBox: null,
       currentTY: 0, currentSX: 0, currentEX: 0.2, currentGrip: 1,
       goalTY: 0, goalSX: 0, goalEX: 0.2, goalGrip: 1,
@@ -1171,7 +1237,6 @@ try {
 
   // IK solver for 2-link arm
   const L1 = 110, L2 = 90;
-  const ARM_Z = -100;
 
   function solveIK(targetX, targetY, targetZ, armX) {
     const dx = targetX - armX;
@@ -1179,7 +1244,7 @@ try {
     const ty = Math.atan2(dx, dz);
 
     const horizontalDist = Math.sqrt(dx * dx + dz * dz);
-    const verticalDist = targetY - 70; // shoulder world Y = 60 + 10
+    const verticalDist = targetY - 66; // shoulder world Y = 56 + 10
     const d = Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist);
 
     const maxReach = L1 + L2 - 5;
@@ -1211,97 +1276,145 @@ try {
     return best;
   }
 
+  const EXIT_Z = -150;
+  function near(arm) {
+    return Math.abs(arm.currentTY - arm.goalTY) < 0.05 &&
+           Math.abs(arm.currentSX - arm.goalSX) < 0.05 &&
+           Math.abs(arm.currentEX - arm.goalEX) < 0.05;
+  }
+  function reach(arm, x, y, z, grip) {
+    const ik = solveIK(x, y, z, arm.armX);
+    arm.goalTY = ik.ty; arm.goalSX = ik.sx; arm.goalEX = ik.ex; arm.goalGrip = grip;
+  }
+
   function updateArmState(arm, dt, boxes) {
     arm.stateTime += dt;
+    const cell = arm.cell;
 
     switch (arm.state) {
-      case 'idle': {
+      case 'idle':
         arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 1;
-        arm.heldBox.visible = false;
-        if (arm.stateTime >= arm.idleCooldown) {
+        arm.held.group.visible = false;
+        if (arm.stateTime >= arm.idleCooldown && cell.state === 'empty') {
           const box = selectBox(arm, boxes);
-          if (box) {
-            box.userData.claimed = true;
-            arm.targetBox = box;
-            arm.state = 'reaching'; arm.stateTime = 0;
-          }
+          if (box) { box.userData.claimed = true; arm.targetBox = box; arm.state = 'reaching'; arm.stateTime = 0; }
         }
         break;
-      }
-      case 'reaching': {
+
+      case 'reaching':
         if (!arm.targetBox || !arm.targetBox.visible) {
           if (arm.targetBox) arm.targetBox.userData.claimed = false;
-          arm.targetBox = null;
-          arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 200;
-          break;
+          arm.targetBox = null; arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 200; break;
         }
-        const ik = solveIK(arm.targetBox.position.x, arm.targetBox.position.y, arm.targetBox.position.z, arm.armX);
-        arm.goalTY = ik.ty; arm.goalSX = ik.sx; arm.goalEX = ik.ex; arm.goalGrip = 1;
-        const dTY = Math.abs(arm.currentTY - arm.goalTY);
-        const dSX = Math.abs(arm.currentSX - arm.goalSX);
-        const dEX = Math.abs(arm.currentEX - arm.goalEX);
-        if (dTY < 0.05 && dSX < 0.05 && dEX < 0.05) {
-          arm.state = 'grabbing'; arm.stateTime = 0;
-        }
-        if (arm.stateTime > 3000) {
-          arm.targetBox.userData.claimed = false;
-          arm.targetBox = null;
-          arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 500;
-        }
+        reach(arm, arm.targetBox.position.x, 34, 0, 1);
+        if (near(arm)) { arm.state = 'grabbing'; arm.stateTime = 0; }
+        if (arm.stateTime > 3200) { arm.targetBox.userData.claimed = false; arm.targetBox = null; arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 500; }
         break;
-      }
-      case 'grabbing': {
+
+      case 'grabbing':
         arm.goalGrip = 0;
-        if (arm.stateTime >= 200) {
-          arm.heldBox.visible = true;
+        if (arm.stateTime >= 240) {
+          arm.held.group.visible = true; setDocProcessed(arm.held, false);
           if (arm.targetBox) arm.targetBox.visible = false;
           arm.state = 'lifting'; arm.stateTime = 0;
         }
         break;
-      }
-      case 'lifting': {
+
+      case 'lifting':
         arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 0;
-        if (arm.stateTime >= 800) {
-          arm.state = 'dropping'; arm.stateTime = 0;
-        }
+        if (arm.stateTime >= 650) { arm.state = 'toPlaten'; arm.stateTime = 0; }
         break;
-      }
-      case 'dropping': {
-        const dropIK = solveIK(arm.armX, 40, -160, arm.armX);
-        arm.goalTY = dropIK.ty; arm.goalSX = dropIK.sx; arm.goalEX = dropIK.ex; arm.goalGrip = 0;
-        if (arm.stateTime >= 1000) {
-          arm.state = 'releasing'; arm.stateTime = 0;
-        }
+
+      case 'toPlaten':
+        reach(arm, arm.armX, 28, platenZ, 0);
+        if (near(arm) || arm.stateTime > 2800) { arm.state = 'placing'; arm.stateTime = 0; }
         break;
-      }
-      case 'releasing': {
+
+      case 'placing':
         arm.goalGrip = 1;
-        arm.heldBox.visible = false;
-        if (arm.stateTime >= 200) {
-          // Spawn exit box at drop position
-          arm.exitBox.position.set(arm.armX, 20, -160);
-          arm.exitBox.visible = true;
-          arm.exitBox.userData.sliding = true;
-          arm.exitBox.rotation.y = 0;
-          // Reset original belt box
-          if (arm.targetBox) {
-            arm.targetBox.position.x = -700;
-            arm.targetBox.visible = true;
-            arm.targetBox.userData.claimed = false;
-            arm.targetBox = null;
-          }
+        if (arm.stateTime >= 260) {
+          arm.held.group.visible = false;
+          setDocProcessed(cell.workDoc, false);
+          cell.workDoc.group.visible = true;
+          cell.state = 'working'; cell.workTime = 0;
+          if (arm.targetBox) { arm.targetBox.position.x = -700; arm.targetBox.visible = true; arm.targetBox.userData.claimed = false; arm.targetBox = null; }
+          arm.state = 'waiting'; arm.stateTime = 0;
+        }
+        break;
+
+      case 'waiting': // retract and watch the tools work the document
+        arm.goalTY = 0; arm.goalSX = -0.15; arm.goalEX = 0.5; arm.goalGrip = 1;
+        if (cell.state === 'done') { arm.state = 'retrieving'; arm.stateTime = 0; }
+        break;
+
+      case 'retrieving':
+        reach(arm, arm.armX, 28, platenZ, 1);
+        if (near(arm) || arm.stateTime > 2800) { arm.state = 'gripDoc'; arm.stateTime = 0; }
+        break;
+
+      case 'gripDoc':
+        arm.goalGrip = 0;
+        if (arm.stateTime >= 240) {
+          cell.workDoc.group.visible = false; cell.state = 'empty';
+          arm.held.group.visible = true; setDocProcessed(arm.held, true);
+          arm.state = 'liftDoc'; arm.stateTime = 0;
+        }
+        break;
+
+      case 'liftDoc':
+        arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 0;
+        if (arm.stateTime >= 650) { arm.state = 'toExit'; arm.stateTime = 0; }
+        break;
+
+      case 'toExit':
+        reach(arm, arm.armX, 30, EXIT_Z, 0);
+        if (near(arm) || arm.stateTime > 2800) { arm.state = 'releasing'; arm.stateTime = 0; }
+        break;
+
+      case 'releasing':
+        arm.goalGrip = 1; arm.held.group.visible = false;
+        if (arm.stateTime >= 240) {
+          const ed = arm.exitDoc;
+          ed.group.position.set(arm.armX, 6, EXIT_Z);
+          ed.group.visible = true; ed.group.userData.sliding = true;
           arm.state = 'returning'; arm.stateTime = 0;
         }
         break;
-      }
-      case 'returning': {
+
+      case 'returning':
         arm.goalTY = 0; arm.goalSX = 0; arm.goalEX = 0.2; arm.goalGrip = 1;
-        if (arm.stateTime >= 600) {
-          arm.state = 'idle'; arm.stateTime = 0;
-          arm.idleCooldown = 500 + Math.random() * 1500;
-        }
+        if (arm.stateTime >= 550) { arm.state = 'idle'; arm.stateTime = 0; arm.idleCooldown = 400 + Math.random() * 1200; }
         break;
-      }
+    }
+  }
+
+  // Per-cell tool bridge: scan sweep, then pen signature, then cost-code stamp.
+  function updateCell(cell, dt) {
+    if (cell.state !== 'working') { cell.scanner.visible = false; cell.pen.visible = false; return; }
+    cell.workTime += dt;
+    const t = cell.workTime, wd = cell.workDoc, ax = cell.ax;
+    if (t < 1400) {                       // SCAN — glowing bar sweeps the length of the doc
+      cell.scanner.visible = true; cell.pen.visible = false;
+      cell.scanner.position.z = platenZ - 26 + (t / 1400) * 52;
+    } else if (t < 1600) {
+      cell.scanner.visible = false;
+    } else if (t < 3400) {                // SIGN — pen traces, strokes appear one by one
+      cell.scanner.visible = false; cell.pen.visible = true;
+      const n = wd.sigMarks.length;
+      const p = (t - 1600) / 1800;
+      const idx = Math.min(n, Math.floor(p * n + 0.0001));
+      for (let k = 0; k < n; k++) wd.sigMarks[k].visible = k < idx;
+      const m = wd.sigMarks[Math.min(n - 1, idx)];
+      cell.pen.position.set(ax + m.position.x, 12 + Math.abs(Math.sin(p * Math.PI * 6)) * 3, platenZ + m.position.z);
+    } else if (t < 4200) {                // STAMP — pen presses the cost-code block
+      cell.pen.visible = true; cell.scanner.visible = false;
+      const p = (t - 3400) / 800;
+      const dip = (p < 0.5 ? p : 1 - p) * 2;
+      cell.pen.position.set(ax + wd.stamp.position.x, 22 - dip * 12, platenZ + wd.stamp.position.z);
+      if (p > 0.5) wd.stamp.visible = true;
+    } else {
+      cell.pen.visible = false; cell.scanner.visible = false;
+      cell.state = 'done';
     }
   }
 
@@ -1333,31 +1446,21 @@ try {
   );
   observer.observe(container.closest('.hero'));
 
-  const beltSpeed = 0.06; // units per ms
+  const beltSpeed = 0.055; // units per ms
 
-  let prev = performance.now();
-  function animate(now) {
-    requestAnimationFrame(animate);
-    if (!isVisible) { prev = now; return; }
-    const dt = now - prev;
-    prev = now;
-    const s = speedMultiplier;
-
-    // Conveyor items slide right and wrap
+  function frame(dt, s) {
+    // Documents ride the intake belt and wrap around
     for (const item of items) {
       if (item.userData.claimed) continue;
       item.position.x += beltSpeed * dt * s;
       if (item.position.x > 700) item.position.x -= 1400;
-      item.rotation.y += 0.0008 * dt * s;
     }
-
-    // Roller marks move with belt and wrap
     for (const roller of rollers) {
       roller.position.x += beltSpeed * dt * s;
       if (roller.position.x > 700) roller.position.x -= 1400;
     }
 
-    // Robot arm pick-and-place (IK driven)
+    // Robot arms (IK pick / carry / place) and their work cells
     for (const arm of arms) {
       updateArmState(arm, dt * s, items);
       arm.currentTY = lerpAngle(arm.currentTY, arm.goalTY, 6, dt * s);
@@ -1367,30 +1470,33 @@ try {
       arm.turretGroup.rotation.y = arm.currentTY;
       arm.shoulderGroup.rotation.x = arm.currentSX;
       arm.elbowGroup.rotation.x = arm.currentEX;
-      const spread = arm.currentGrip * 14;
-      arm.fingerL.position.x = -6 - spread;
-      arm.fingerR.position.x = 6 + spread;
+      const pad = 22 + arm.currentGrip * 4;
+      arm.padL.position.x = -pad;
+      arm.padR.position.x = pad;
     }
+    for (const cell of cells) updateCell(cell, dt * s);
 
-    // Exit boxes slide away on perpendicular belts
-    for (const box of exitBoxes) {
-      if (!box.userData.sliding) continue;
-      box.position.z -= beltSpeed * dt * s;
-      box.rotation.y += 0.0008 * dt * s;
-      if (box.position.z < -550) {
-        box.visible = false;
-        box.userData.sliding = false;
-      }
+    // Finished documents slide out on the outbound belts
+    for (const d of exitDocs) {
+      if (!d.group.userData.sliding) continue;
+      d.group.position.z -= beltSpeed * dt * s;
+      if (d.group.position.z < -560) { d.group.visible = false; d.group.userData.sliding = false; }
     }
-
-    // Exit belt roller marks animate
     for (const rollerSet of exitRollers) {
       for (const roller of rollerSet) {
         roller.position.z -= beltSpeed * dt * s;
-        if (roller.position.z < -550) roller.position.z += 400;
+        if (roller.position.z < -560) roller.position.z += 400;
       }
     }
+  }
 
+  let prev = performance.now();
+  function animate(now) {
+    requestAnimationFrame(animate);
+    if (!isVisible) { prev = now; return; }
+    const dt = Math.min(now - prev, 60); // clamp after tab-away so nothing teleports
+    prev = now;
+    frame(dt, speedMultiplier);
     effect.render(scene, camera);
   }
   requestAnimationFrame(animate);
