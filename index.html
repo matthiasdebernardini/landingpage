@@ -325,12 +325,6 @@
     font-size: 34px; font-weight: 900; letter-spacing: 0.04em;
     color: var(--text-bright); line-height: 1;
   }
-  .agstaff-badge .tag {
-    font-family: var(--mono); font-size: 9px; font-weight: 700;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
-  }
-  .agstaff-badge .tag::before { content: '[ '; color: var(--text-dim); }
-  .agstaff-badge .tag::after  { content: ' ]'; color: var(--text-dim); }
 
   .agstaff-label {
     font-family: var(--mono); font-size: 10px; font-weight: 700;
@@ -419,10 +413,6 @@
   .agstaff-meta b { color: var(--text-bright); font-weight: 600; }
 
   .agstaff-actions { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-  .agstaff-actions .note {
-    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--text-dim);
-  }
 
   @media (max-width: 900px) {
     .agstaff-lead { grid-template-columns: 1fr; gap: 32px; }
@@ -946,7 +936,6 @@
         <span class="card-crosshair" aria-hidden="true">+</span>
         <img src="agstaff-icon.png" width="104" height="104" alt="agstaff logo">
         <span class="agstaff-wordmark">agstaff</span>
-        <span class="tag">Top Offering</span>
       </div>
 
       <div>
@@ -1009,7 +998,6 @@
 
     <div class="agstaff-actions">
       <a href="https://agstaff.pages.dev" target="_blank" rel="noopener" class="btn-primary btn-primary-lg">Explore agstaff <span class="chevron-anim">&gt;&gt;&gt;&gt;</span></a>
-      <span class="note">Our #1 offering</span>
     </div>
 
   </div>
